@@ -1,11 +1,13 @@
 @using NodeEditor.Blazor.Services
+@using Microsoft.Extensions.DependencyInjection
 @implements IDisposable
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
 @inject ICoordinateConverter CoordinateConverter
 @inject ICanvasInteractionHandler Interaction
 @inject IViewportCuller ViewportCuller
-@inject INodeRegistryService _registry
+@inject INodeRegistryService InjectedRegistry
+@inject IServiceProvider ServiceProvider
 
 <div class="ne-canvas"
      @ref="_canvasRef"
@@ -31,11 +33,13 @@
                         Start="Interaction.SelectionStart"
                         Current="Interaction.SelectionCurrent" />
 
+    <CascadingValue Value="_registry">
     <CanvasContextMenu IsOpen="Interaction.IsContextMenuOpen"
                        Position="Interaction.ContextMenuScreenPosition"
                        OnSelect="AddNodeFromDefinition"
                        OnAddOverlay="AddOverlayFromContextMenu"
-                       OnClose="CloseContextMenu" />
+                       OnClose="CloseContextMenu"/>
+    </CascadingValue>
 
     @if (_isNodeContextMenuOpen)
     {
@@ -108,6 +112,7 @@
 @code {
     private ElementReference _canvasRef;
     private ElementReference _svgRef;
+    private INodeRegistryService? _registry;
 
     private Point2D _canvasScreenOffset = Point2D.Zero;
 
@@ -131,6 +136,9 @@
 
     [Parameter]
     public double ZoomStep { get; set; } = 0.1;
+
+    [Parameter]
+    public string? NodeRegisteryKey { get; set; }
 
     private string ViewportTransformStyle =>
         $"transform: translate({Interaction.PanOffset.X}px, {Interaction.PanOffset.Y}px) scale({Interaction.Zoom});";
@@ -206,6 +214,21 @@
         State.OverlaySelectionChanged += OnStateChanged;
 
         UpdateCulling();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(NodeRegisteryKey))
+        {
+            _registry = ServiceProvider.GetKeyedService<INodeRegistryService>(NodeRegisteryKey);
+            if (_registry is null)
+            {
+                throw new InvalidOperationException($"No INodeRegistryService registered with key '{NodeRegisteryKey}'.");
+            }
+        } else
+        {
+            _registry = InjectedRegistry;
+        }
     }
 
     public void Dispose()
