@@ -12,4 +12,8 @@ public sealed record NodeExecutionOptions(
         ExecutionMode.Sequential,
         AllowBackground: false,
         MaxDegreeOfParallelism: Environment.ProcessorCount);
+    public static NodeExecutionOptions DefaultWithNodeRegistryKey(object? key) => new(
+        ExecutionMode.Sequential,
+        AllowBackground: false,
+        MaxDegreeOfParallelism: Environment.ProcessorCount, key);
 }
