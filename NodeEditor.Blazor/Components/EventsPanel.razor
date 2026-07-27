@@ -7,7 +7,7 @@
     @onmousemove="OnPanelMouseMove"
     @onmouseup="OnPanelMouseUp"
     @onmouseleave="OnPanelMouseUp">
-    <div class="ne-events-header ne-panel-drag-handle"
+    <div class="ne-events-header @(IsDraggable ? "ne-panel-drag-handle" : "")"
         @onmousedown="OnPanelMouseDown"
         @onmousedown:preventDefault
         @onmousedown:stopPropagation
@@ -95,6 +95,9 @@
     [Parameter]
     public EventCallback<EventNodeRequest> OnCreateEventNode { get; set; }
 
+    [Parameter]
+    public bool IsDraggable { get; set; } = true;
+
     private bool _isCollapsed;
     private bool _isAddingNew;
     private string _newEventName = "";
@@ -130,6 +133,7 @@
 
     private void OnPanelMouseDown(MouseEventArgs e)
     {
+        if (!IsDraggable) return;
         _isDraggingPanel = true;
         _panelDragMoved = false;
         _panelDragStartScreen = new Point2D(e.ClientX, e.ClientY);
