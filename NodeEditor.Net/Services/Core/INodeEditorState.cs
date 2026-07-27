@@ -43,6 +43,9 @@ public interface INodeEditorState
     HashSet<string> SelectedOverlayIds { get; }
     ConnectionData? SelectedConnection { get; }
 
+    // data
+    object? NodeRegistryKey { get; set; }
+
     // Viewport
     double Zoom { get; set; }
     Rect2D Viewport { get; set; }

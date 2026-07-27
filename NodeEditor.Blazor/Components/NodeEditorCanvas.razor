@@ -137,9 +137,6 @@
     [Parameter]
     public double ZoomStep { get; set; } = 0.1;
 
-    [Parameter]
-    public string? NodeRegisteryKey { get; set; }
-
     private string ViewportTransformStyle =>
         $"transform: translate({Interaction.PanOffset.X}px, {Interaction.PanOffset.Y}px) scale({Interaction.Zoom});";
 
@@ -218,12 +215,12 @@
 
     protected override void OnParametersSet()
     {
-        if (!string.IsNullOrWhiteSpace(NodeRegisteryKey))
+        if (State.NodeRegistryKey is not null)
         {
-            _registry = ServiceProvider.GetKeyedService<INodeRegistryService>(NodeRegisteryKey);
+            _registry = ServiceProvider.GetKeyedService<INodeRegistryService>(State.NodeRegistryKey);
             if (_registry is null)
             {
-                throw new InvalidOperationException($"No INodeRegistryService registered with key '{NodeRegisteryKey}'.");
+                throw new InvalidOperationException($"No INodeRegistryService registered with key '{State.NodeRegistryKey}'.");
             }
         } else
         {

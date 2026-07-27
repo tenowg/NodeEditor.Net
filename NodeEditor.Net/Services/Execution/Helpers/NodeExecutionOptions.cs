@@ -4,6 +4,7 @@ public sealed record NodeExecutionOptions(
     ExecutionMode Mode,
     bool AllowBackground,
     int MaxDegreeOfParallelism,
+    object? NodeRegistryKey = null,
     StreamMode StreamMode = StreamMode.Sequential,
     int MaxCallDepth = 512)
 {

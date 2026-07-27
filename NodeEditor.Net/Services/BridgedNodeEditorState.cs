@@ -208,6 +208,7 @@ public sealed class BridgedNodeEditorState : INodeEditorState
     // ── Viewport ────────────────────────────────────────────────────────
     public double Zoom { get => State.Zoom; set => Dispatch(() => State.Zoom = value); }
     public Rect2D Viewport { get => State.Viewport; set => Dispatch(() => State.Viewport = value); }
+    public object? NodeRegistryKey { get => State.NodeRegistryKey; set => State.NodeRegistryKey = value; }
 
     // ── Execution bridge ────────────────────────────────────────────────
     public IReadOnlyList<NodeData> BuildExecutionNodes() => State.BuildExecutionNodes();

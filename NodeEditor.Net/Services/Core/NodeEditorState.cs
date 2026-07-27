@@ -454,6 +454,8 @@ public class NodeEditorState : INodeEditorState
         }
     }
 
+    public object? NodeRegistryKey { get; set; }
+
     /// <summary>
     /// Adds a node to the graph and raises the <see cref="NodeAdded"/> event.
     /// </summary>

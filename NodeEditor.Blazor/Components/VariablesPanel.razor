@@ -1,6 +1,8 @@
 @using NodeEditor.Net.Models
 @using NodeEditor.Blazor.Services.Editors
 @using NodeEditor.Net.ViewModels
+@* This just needs to be loaded, do not remove *@
+@inject VariableNodeFactory VariableNodeFactory 
 @implements IDisposable
 
 @inject NodeEditorCustomEditorRegistry EditorRegistry

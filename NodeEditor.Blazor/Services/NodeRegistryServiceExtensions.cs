@@ -21,14 +21,14 @@ namespace NodeEditor.Blazor.Services
                     factory: (serviceProvider, _) =>
                     {
                         // DI supplies all constructor dependencies of NodeRegistryService.
-                        //var registry = ActivatorUtilities.CreateInstance<NodeRegistryService>(
-                        //    serviceProvider);
+                        var registry = ActivatorUtilities.CreateInstance<NodeRegistryService>(
+                            serviceProvider);
 
-                        //// Registration occurs once when this keyed instance is created.
-                        //configure(registry);
-                        var registry = new NodeRegistryService(new NodeDiscoveryService());
+                        // Registration occurs once when this keyed instance is created.
                         configure(registry);
-                        //registry.RegisterFromAssembly(AppDomain.CurrentDomain.GetAssemblies()[0]);
+                        //var registry = new NodeRegistryService(new NodeDiscoveryService());
+                        //configure(registry);
+                        
                         return registry;
                     },
                     lifetime: lifetime));
