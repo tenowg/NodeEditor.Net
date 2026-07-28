@@ -21,9 +21,16 @@
         @if (@Node.Data.HelpDefinitionId is not null)
         {
             <span style="position: relative;">
-                <button type="button" @onmousedown="ShowHelpTip">?</button>
+                <span type="button" @onmousedown="ShowHelpTip">?</span>
+                @{
+                    var helpType = Type.GetType(Node.Data.HelpDefinitionId);
+                }
                 <div style="@(ShowHelp ? "position: absolute; bottom: 100%; left: 30px; transform: translateY(50%);" : "display: none;")">
-                    <DynamicComponent Type="@(Type.GetType(Node.Data.HelpDefinitionId))"></DynamicComponent>
+                    
+                    @if (helpType is not null)
+                    {
+                        <DynamicComponent Type="@helpType"></DynamicComponent>
+                    }
                 </div>
             </span>
         }

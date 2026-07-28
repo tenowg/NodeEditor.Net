@@ -56,8 +56,8 @@ public sealed class EventNodeFactory
     {
         var stubs = new[]
         {
-            new NodeDefinition(graphEvent.ListenerDefinitionId, "", "", "", Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!),
-            new NodeDefinition(graphEvent.TriggerDefinitionId, "", "", "", Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!)
+            new NodeDefinition(graphEvent.ListenerDefinitionId, "", "", "", false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!),
+            new NodeDefinition(graphEvent.TriggerDefinitionId, "", "", "", false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!)
         };
         _registry.RemoveDefinitions(stubs);
     }
@@ -80,6 +80,7 @@ public sealed class EventNodeFactory
             Name: "Custom Event: " + graphEvent.Name,
             Category: "Events",
             Description: $"Listens for the '{graphEvent.Name}' event. Execution flows from Exit when this event is triggered.",
+            IsReadOnly: false,
             Inputs: Array.Empty<SocketData>(),
             Outputs: outputs,
             Factory: () => new NodeData(
@@ -87,6 +88,7 @@ public sealed class EventNodeFactory
                 Name: "Custom Event: " + graphEvent.Name,
                 Callable: true,
                 ExecInit: true,
+                IsReadOnly: false,
                 Inputs: Array.Empty<SocketData>(),
                 Outputs: outputs,
                 DefinitionId: graphEvent.ListenerDefinitionId));
@@ -115,6 +117,7 @@ public sealed class EventNodeFactory
             Name: "Trigger Event: " + graphEvent.Name,
             Category: "Events",
             Description: $"Triggers the '{graphEvent.Name}' event. All matching Custom Event listeners will execute.",
+            IsReadOnly: false,
             Inputs: inputs,
             Outputs: outputs,
             Factory: () => new NodeData(
@@ -122,6 +125,7 @@ public sealed class EventNodeFactory
                 Name: "Trigger Event: " + graphEvent.Name,
                 Callable: true,
                 ExecInit: false,
+                IsReadOnly: false,
                 Inputs: inputs,
                 Outputs: outputs,
                 DefinitionId: graphEvent.TriggerDefinitionId));

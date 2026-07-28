@@ -12,6 +12,7 @@ public sealed record class NodeDefinition(
     string Name,
     string Category,
     string Description,
+    bool IsReadOnly,
     IReadOnlyList<SocketData> Inputs,
     IReadOnlyList<SocketData> Outputs,
     Func<NodeData> Factory,

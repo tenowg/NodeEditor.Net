@@ -139,6 +139,7 @@ public sealed class NodeBuilder : INodeBuilder
             Name: name,
             Category: _category,
             Description: _description,
+            IsReadOnly: false,
             Inputs: inputsSnapshot,
             Outputs: outputsSnapshot,
             Factory: () => new NodeData(
@@ -146,6 +147,7 @@ public sealed class NodeBuilder : INodeBuilder
                 Name: name,
                 Callable: callable,
                 ExecInit: execInit,
+                IsReadOnly: false,
                 Inputs: inputsSnapshot,
                 Outputs: outputsSnapshot,
                 DefinitionId: id,

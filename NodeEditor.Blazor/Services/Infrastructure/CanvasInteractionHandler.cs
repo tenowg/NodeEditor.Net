@@ -812,6 +812,7 @@ public sealed class CanvasInteractionHandler : ICanvasInteractionHandler
             data.Name,
             data.Callable,
             data.ExecInit,
+            data.IsReadOnly,
             inputs,
             outputs,
             data.DefinitionId);

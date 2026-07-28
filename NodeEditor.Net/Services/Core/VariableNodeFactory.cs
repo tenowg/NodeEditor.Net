@@ -72,8 +72,8 @@ public sealed class VariableNodeFactory
         // Build stubs with matching IDs so RemoveDefinitions can find them
         var stubs = new[]
         {
-            new NodeDefinition(getDefId, "", "", "", Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!),
-            new NodeDefinition(setDefId, "", "", "", Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!)
+            new NodeDefinition(getDefId, "", "", "", false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!),
+            new NodeDefinition(setDefId, "", "", "", false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!)
         };
         Registry.RemoveDefinitions(stubs);
     }
@@ -94,6 +94,7 @@ public sealed class VariableNodeFactory
             Name: $"Get Variable ({variable.Name})",
             Category: "Variables",
             Description: $"Gets the current value of variable '{variable.Name}'.",
+            IsReadOnly: variable.IsReadOnly,
             Inputs: Array.Empty<SocketData>(),
             Outputs: outputs,
             Factory: () => new NodeData(
@@ -101,6 +102,7 @@ public sealed class VariableNodeFactory
                 Name: $"Get Variable ({variable.Name})",
                 Callable: false,
                 ExecInit: false,
+                IsReadOnly: variable.IsReadOnly,
                 Inputs: Array.Empty<SocketData>(),
                 Outputs: outputs,
                 DefinitionId: variable.GetDefinitionId));
@@ -130,6 +132,7 @@ public sealed class VariableNodeFactory
             Name: $"Set Variable ({variable.Name})",
             Category: "Variables",
             Description: $"Sets the value of variable '{variable.Name}'.",
+            IsReadOnly: variable.IsReadOnly,
             Inputs: inputs,
             Outputs: outputs,
             Factory: () => new NodeData(
@@ -137,6 +140,7 @@ public sealed class VariableNodeFactory
                 Name: $"Set Variable({variable.Name})",
                 Callable: true,
                 ExecInit: false,
+                IsReadOnly: variable.IsReadOnly,
                 Inputs: inputs,
                 Outputs: outputs,
                 DefinitionId: variable.SetDefinitionId));

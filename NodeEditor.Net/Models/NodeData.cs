@@ -5,6 +5,7 @@ public sealed record class NodeData(
     string Name,
     bool Callable,
     bool ExecInit,
+    bool IsReadOnly,
     IReadOnlyList<SocketData> Inputs,
     IReadOnlyList<SocketData> Outputs,
     string? DefinitionId = null,

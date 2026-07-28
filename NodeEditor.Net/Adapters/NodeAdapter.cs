@@ -34,6 +34,7 @@ public sealed class NodeAdapter : INodeAdapter
             snapshot.Name,
             snapshot.Callable,
             snapshot.ExecInit,
+            false,
             inputs,
             outputs);
     }

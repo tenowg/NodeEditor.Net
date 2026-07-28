@@ -94,7 +94,7 @@ public interface INodeEditorState
     void RequestRedo();
 
     // Variables
-    void AddVariable(GraphVariable variable);
+    void AddVariable(GraphVariable variable, bool failOnDuplicateName = false);
     void RemoveVariable(string variableId);
     void UpdateVariable(GraphVariable updated);
     GraphVariable? FindVariable(string variableId);

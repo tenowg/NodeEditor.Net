@@ -9,7 +9,8 @@ public sealed record class GraphVariable(
     string Id,
     string Name,
     string TypeName,
-    SocketValue? DefaultValue = null)
+    SocketValue? DefaultValue = null,
+    bool IsReadOnly = false)
 {
     /// <summary>
     /// Well-known definition ID prefix for Get Variable nodes.
@@ -34,8 +35,8 @@ public sealed record class GraphVariable(
     /// <summary>
     /// Creates a new variable with a generated ID.
     /// </summary>
-    public static GraphVariable Create(string name, string typeName, SocketValue? defaultValue = null)
+    public static GraphVariable Create(string name, string typeName, SocketValue? defaultValue = null, bool isReadOnly = false)
     {
-        return new GraphVariable(Guid.NewGuid().ToString("N"), name, typeName, defaultValue);
+        return new GraphVariable(Guid.NewGuid().ToString("N"), name, typeName, defaultValue, isReadOnly);
     }
 }

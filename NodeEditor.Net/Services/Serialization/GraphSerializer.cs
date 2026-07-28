@@ -229,6 +229,7 @@ public sealed class GraphSerializer : IGraphSerializer
             dto.Name,
             dto.Callable,
             dto.ExecInit,
+            dto.IsReadOnly,
             inputs,
             outputs,
             typeId,
@@ -300,6 +301,7 @@ public sealed class GraphSerializer : IGraphSerializer
             node.Data.Id,
             node.Data.DefinitionId,
             node.Data.HelpDefinitionId,
+            node.Data.IsReadOnly,
             node.Data.Name,
             node.Data.Callable,
             node.Data.ExecInit,
@@ -327,6 +329,7 @@ public sealed class GraphSerializer : IGraphSerializer
             variable.Id,
             variable.Name,
             variable.TypeName,
+            variable.IsReadOnly,
             variable.DefaultValue);
     }
 
@@ -336,7 +339,8 @@ public sealed class GraphSerializer : IGraphSerializer
             variable.Id,
             variable.Name,
             variable.TypeName,
-            variable.DefaultValue);
+            variable.DefaultValue,
+            variable.IsReadOnly);
     }
 
     private static GraphEventDto ToDto(GraphEvent graphEvent)
