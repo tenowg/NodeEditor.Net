@@ -228,7 +228,8 @@ public class NodeEditorState : INodeEditorState
                 vm.Data.ExecInit,
                 vm.Inputs.Select(socket => socket.Data).ToList(),
                 vm.Outputs.Select(socket => socket.Data).ToList(),
-                vm.Data.DefinitionId),
+                vm.Data.DefinitionId,
+                vm.Data.HelpDefinitionId),
             vm.Position,
             vm.Size)).ToList();
 

@@ -231,7 +231,8 @@ public sealed class GraphSerializer : IGraphSerializer
             dto.ExecInit,
             inputs,
             outputs,
-            typeId);
+            typeId,
+            dto.HelpTypeId);
 
         return new GraphNodeData(
             nodeData,
@@ -298,6 +299,7 @@ public sealed class GraphSerializer : IGraphSerializer
         return new NodeDto(
             node.Data.Id,
             node.Data.DefinitionId,
+            node.Data.HelpDefinitionId,
             node.Data.Name,
             node.Data.Callable,
             node.Data.ExecInit,

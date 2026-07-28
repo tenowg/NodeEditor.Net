@@ -16,9 +16,12 @@ public interface INodeBuilder
     INodeBuilder Name(string name);
     INodeBuilder Category(string category);
     INodeBuilder Description(string description);
+    INodeBuilder HelpClass<T>();
 
     // ── Execution sockets ──
+    INodeBuilder Callable(string entry, string exit);
     INodeBuilder Callable();
+    INodeBuilder ExecutionInitiator(string name);
     INodeBuilder ExecutionInitiator();
     INodeBuilder ExecutionInput(string name);
     INodeBuilder ExecutionOutput(string name);

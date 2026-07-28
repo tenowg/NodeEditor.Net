@@ -17,4 +17,5 @@ public sealed record class NodeDefinition(
     Func<NodeData> Factory,
     Type? NodeType = null,
     Func<INodeExecutionContext, CancellationToken, Task>? InlineExecutor = null,
-    IReadOnlyList<StreamSocketInfo>? StreamSockets = null);
+    IReadOnlyList<StreamSocketInfo>? StreamSockets = null,
+    Type? HelpComponent = null);

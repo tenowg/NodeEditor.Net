@@ -20,6 +20,7 @@ public sealed class NodeBuilder : INodeBuilder
     private Func<INodeExecutionContext, CancellationToken, Task>? _inlineExecutor;
     private readonly List<StreamSocketInfo> _streamSockets = new();
     internal Type? NodeType { get; set; }
+    internal Type? HelpType { get; set; }
 
     private NodeBuilder() { }
 
@@ -35,20 +36,30 @@ public sealed class NodeBuilder : INodeBuilder
     public INodeBuilder Description(string description) { _description = description; return this; }
 
     // ── Execution sockets ──
-    public INodeBuilder Callable()
+    public INodeBuilder Callable(string entry, string exit)
     {
         _callable = true;
-        AddSocketIfMissing(_inputs, new SocketData("Enter", ExecutionSocketTypeName, true, true));
-        AddSocketIfMissing(_outputs, new SocketData("Exit", ExecutionSocketTypeName, false, true));
+        AddSocketIfMissing(_inputs, new SocketData(entry, ExecutionSocketTypeName, true, true));
+        AddSocketIfMissing(_outputs, new SocketData(exit, ExecutionSocketTypeName, false, true));
+        return this;
+    }
+
+    public INodeBuilder Callable()
+    {
+        return Callable("Enter", "Exit");
+    }
+
+    public INodeBuilder ExecutionInitiator(string name)
+    {
+        _callable = true;
+        _execInit = true;
+        AddSocketIfMissing(_outputs, new SocketData(name, ExecutionSocketTypeName, false, true));
         return this;
     }
 
     public INodeBuilder ExecutionInitiator()
     {
-        _callable = true;
-        _execInit = true;
-        AddSocketIfMissing(_outputs, new SocketData("Exit", ExecutionSocketTypeName, false, true));
-        return this;
+        return ExecutionInitiator("Exit");
     }
 
     public INodeBuilder ExecutionInput(string name)
@@ -137,10 +148,12 @@ public sealed class NodeBuilder : INodeBuilder
                 ExecInit: execInit,
                 Inputs: inputsSnapshot,
                 Outputs: outputsSnapshot,
-                DefinitionId: id),
+                DefinitionId: id,
+                HelpDefinitionId: BuildHelpDefinitionId()),
             NodeType: NodeType,
             InlineExecutor: _inlineExecutor,
-            StreamSockets: _streamSockets.Count > 0 ? _streamSockets.AsReadOnly() : null);
+            StreamSockets: _streamSockets.Count > 0 ? _streamSockets.AsReadOnly() : null,
+            HelpType);
     }
 
     private string BuildDefinitionId()
@@ -149,11 +162,24 @@ public sealed class NodeBuilder : INodeBuilder
         return _name;
     }
 
+    private string? BuildHelpDefinitionId()
+    {
+        if (HelpType is not null)
+        {
+            var assembly = HelpType.Assembly.GetName().Name;
+            var typeName = HelpType.FullName ?? HelpType.Name;
+            return $"{typeName}, {assembly}";
+        }
+        return null;
+    }
+
     private static void AddSocketIfMissing(List<SocketData> list, SocketData socket)
     {
         if (!list.Any(s => s.Name == socket.Name && s.IsInput == socket.IsInput))
             list.Add(socket);
     }
+
+    public INodeBuilder HelpClass<T>() { HelpType = typeof(T); return this; }
 
     private static readonly string ExecutionSocketTypeName = ExecutionSocket.TypeName;
 }

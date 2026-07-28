@@ -7,5 +7,6 @@ public sealed record class NodeData(
     bool ExecInit,
     IReadOnlyList<SocketData> Inputs,
     IReadOnlyList<SocketData> Outputs,
-    string? DefinitionId = null
+    string? DefinitionId = null,
+    string? HelpDefinitionId = null
 );

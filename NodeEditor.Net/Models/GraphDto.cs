@@ -14,6 +14,7 @@ public sealed record class GraphDto(
 public sealed record class NodeDto(
     string Id,
     string? TypeId,
+    string? HelpTypeId,
     string Name,
     bool Callable,
     bool ExecInit,
