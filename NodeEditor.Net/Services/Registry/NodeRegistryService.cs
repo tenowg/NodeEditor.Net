@@ -1,5 +1,6 @@
 using System.Reflection;
 using NodeEditor.Net.Services;
+using NodeEditor.Net.Services.Execution;
 using NodeEditor.Net.Services.Execution.StandardNodes;
 
 namespace NodeEditor.Net.Services.Registry;
@@ -7,7 +8,7 @@ namespace NodeEditor.Net.Services.Registry;
 public class NodeRegistryService : INodeRegistryService
 {
     private readonly NodeDiscoveryService _discovery;
-    private readonly List<NodeDefinition> _definitions = new();
+    private readonly List<NodeDefinition> _definitions = [];
     private readonly object _lock = new();
     private bool _initialized;
 
@@ -46,12 +47,9 @@ public class NodeRegistryService : INodeRegistryService
 
     public void RegisterFromAssembly(Assembly assembly)
     {
-        if (assembly is null)
-        {
-            throw new ArgumentNullException(nameof(assembly));
-        }
+        ArgumentNullException.ThrowIfNull(assembly);
 
-        var discovered = _discovery.DiscoverFromAssemblies(new[] { assembly });
+        var discovered = _discovery.DiscoverFromAssemblies([assembly]);
         RegisterDefinitions(discovered);
     }
 
@@ -63,10 +61,7 @@ public class NodeRegistryService : INodeRegistryService
 
     public void RegisterDefinitions(IEnumerable<NodeDefinition> definitions)
     {
-        if (definitions is null)
-        {
-            throw new ArgumentNullException(nameof(definitions));
-        }
+        ArgumentNullException.ThrowIfNull(definitions);
 
         MergeDefinitions(definitions);
         _initialized = true;
@@ -74,10 +69,7 @@ public class NodeRegistryService : INodeRegistryService
 
     public int RemoveDefinitions(IEnumerable<NodeDefinition> definitions)
     {
-        if (definitions is null)
-        {
-            throw new ArgumentNullException(nameof(definitions));
-        }
+        ArgumentNullException.ThrowIfNull(definitions);
 
         var ids = new HashSet<string>(definitions.Select(d => d.Id), StringComparer.Ordinal);
         if (ids.Count == 0)
@@ -110,12 +102,9 @@ public class NodeRegistryService : INodeRegistryService
 
     public int RemoveDefinitionsFromAssembly(Assembly assembly)
     {
-        if (assembly is null)
-        {
-            throw new ArgumentNullException(nameof(assembly));
-        }
+        ArgumentNullException.ThrowIfNull(assembly);
 
-        var discovered = _discovery.DiscoverFromAssemblies(new[] { assembly });
+        var discovered = _discovery.DiscoverFromAssemblies([assembly]);
         return RemoveDefinitions(discovered);
     }
 
@@ -125,9 +114,7 @@ public class NodeRegistryService : INodeRegistryService
         if (!string.IsNullOrWhiteSpace(search))
         {
             var query = search.Trim();
-            definitions = definitions
-                .Where(def => MatchesQuery(def, query))
-                .ToList();
+            definitions = [.. definitions.Where(def => MatchesQuery(def, query))];
         }
 
         return NodeCatalog.Create(definitions);
@@ -161,5 +148,12 @@ public class NodeRegistryService : INodeRegistryService
         return definition.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
                || definition.Category.Contains(query, StringComparison.OrdinalIgnoreCase)
                || definition.Description.Contains(query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public void RegisterNodeByType<T>() where T : NodeBase, new()
+    {
+        var definition = _discovery.BuildDefinitionFromType(typeof(T)) ?? throw new ArgumentNullException(nameof(T));
+        var definitions = new List<NodeDefinition> { definition };
+        RegisterDefinitions(definitions);
     }
 }
