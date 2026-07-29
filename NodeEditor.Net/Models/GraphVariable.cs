@@ -35,8 +35,40 @@ public sealed record class GraphVariable(
     /// <summary>
     /// Creates a new variable with a generated ID.
     /// </summary>
+    /// <param name="name">The name of the Variable</param>
+    /// <param name="typeName">The type of the Variable represents</typeparam>
+    /// <param name="defaultValue">The default value</param>
+    /// <param name="isReadOnly">Is this variable readonly</param>
+    /// <returns></returns>
+    [Obsolete("Please use one of the other overrides for the method", false)]
     public static GraphVariable Create(string name, string typeName, SocketValue? defaultValue = null, bool isReadOnly = false)
     {
         return new GraphVariable(Guid.NewGuid().ToString("N"), name, typeName, defaultValue, isReadOnly);
+    }
+
+    /// <summary>
+    /// Creates a new variable with a generated ID.
+    /// </summary>
+    /// <typeparam name="T">The type of the Variable represents</typeparam>
+    /// <param name="name">The name of the Variable</param>
+    /// <param name="defaultValue">The default value</param>
+    /// <param name="isReadOnly">Is this variable readonly</param>
+    /// <returns></returns>
+    public static GraphVariable Create<T>(string name, SocketValue? defaultValue = null, bool isReadOnly = false)
+    {
+        return new GraphVariable(Guid.NewGuid().ToString("N"), name, typeof(T).FullName ?? "System.Object", defaultValue, isReadOnly);
+    }
+
+    /// <summary>
+    /// Creates a new variable with a generated ID.
+    /// </summary>
+    /// <param name="name">The name of the Variable</param>
+    /// <param name="type">The type of the Variable represents</typeparam>
+    /// <param name="defaultValue">The default value</param>
+    /// <param name="isReadOnly">Is this variable readonly</param>
+    /// <returns></returns>
+    public static GraphVariable Create(string name, Type type, SocketValue? defaultValue = null, bool isReadOnly = false)
+    {
+        return new GraphVariable(Guid.NewGuid().ToString("N"), name, type.FullName ?? "System.Object", defaultValue, isReadOnly);
     }
 }

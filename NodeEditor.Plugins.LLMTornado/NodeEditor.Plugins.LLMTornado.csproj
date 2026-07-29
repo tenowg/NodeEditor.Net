@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LlmTornado" Version="3.8.46" />
+    <PackageReference Include="LlmTornado" Version="3.8.65" />
   </ItemGroup>
 
 </Project>

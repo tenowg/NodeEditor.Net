@@ -584,6 +584,8 @@ public sealed class CanvasInteractionHandler : ICanvasInteractionHandler
         if (variable is null) return;
 
         var isSetNode = e.AltKey;
+
+        if (isSetNode && variable.IsReadOnly) return;
         var definitionId = isSetNode ? variable.SetDefinitionId : variable.GetDefinitionId;
 
         var definition = registry?.Definitions.FirstOrDefault(

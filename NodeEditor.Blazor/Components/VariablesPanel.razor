@@ -80,7 +80,7 @@
                     else
                     {
                         <span class="ne-variables-name" @ondblclick="@(() => StartEdit(variable))">
-                            @variable.Name
+                            @variable.Name @(variable.IsReadOnly ? "(ReadOnly)" : "")
                         </span>
                     }
 
@@ -373,31 +373,24 @@
 
         var nodeVm = new NodeViewModel(nodeData);
 
-        // if (variable.IsReadOnly)
-        // {
-        //     return builder => builder.AddContent(0, "Readonly Variable");
-        // }
-        // else
-        // {
-            var editor = EditorRegistry.GetEditor(socketData);
-            if (editor is null)
+        var editor = EditorRegistry.GetEditor(socketData);
+        if (editor is null)
+        {
+            return builder => builder.AddContent(0, "No editor");
+        }
+
+        var context = new SocketEditorContext
             {
-                return builder => builder.AddContent(0, "No editor");
-            }
-
-            var context = new SocketEditorContext
+                Socket = socketVm,
+                Node = nodeVm,
+                SetValue = value =>
                 {
-                    Socket = socketVm,
-                    Node = nodeVm,
-                    SetValue = value =>
-                    {
-                        var updated = variable with { DefaultValue = SocketValue.FromObject(value) };
-                        State.UpdateVariable(updated);
-                    }
-                };
+                    var updated = variable with { DefaultValue = SocketValue.FromObject(value) };
+                    State.UpdateVariable(updated);
+                }
+            };
 
-            return editor.Render(context);
-        //}
+        return editor.Render(context);
     }
 
     private void OnVariableTypeChanged(GraphVariable variable, string? typeName)
