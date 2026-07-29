@@ -10,7 +10,7 @@ public sealed class SelectionSyncTests
     public void SelectingNode_SetsViewModelFlag()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node);
 
         state.SelectNode("n1");
@@ -23,7 +23,7 @@ public sealed class SelectionSyncTests
     public void ClearingSelection_ResetsViewModelFlags()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()))
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()))
         {
             IsSelected = true
         };

@@ -10,7 +10,7 @@ public sealed class StateEventTests
     public void AddNode_RaisesNodeAddedEvent()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         
         NodeEventArgs? raisedArgs = null;
         state.NodeAdded += (sender, args) => raisedArgs = args;
@@ -25,7 +25,7 @@ public sealed class StateEventTests
     public void RemoveNode_RaisesNodeRemovedEvent()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node);
 
         NodeEventArgs? raisedArgs = null;
@@ -41,7 +41,7 @@ public sealed class StateEventTests
     public void RemoveNode_RemovesFromNodesCollection()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node);
 
         state.RemoveNode("n1");
@@ -53,7 +53,7 @@ public sealed class StateEventTests
     public void RemoveNode_RemovesFromSelection()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node);
         state.SelectNode("n1");
 
@@ -97,7 +97,7 @@ public sealed class StateEventTests
     public void SelectNode_RaisesSelectionChangedEvent()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node);
 
         SelectionChangedEventArgs? raisedArgs = null;
@@ -115,8 +115,8 @@ public sealed class StateEventTests
     public void SelectNode_WithClearExisting_IncludesPreviousSelectionInEvent()
     {
         var state = new NodeEditorState();
-        var node1 = new NodeViewModel(new NodeData("n1", "Test1", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
-        var node2 = new NodeViewModel(new NodeData("n2", "Test2", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node1 = new NodeViewModel(new NodeData("n1", "Test1", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node2 = new NodeViewModel(new NodeData("n2", "Test2", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node1);
         state.AddNode(node2);
         state.SelectNode("n1");
@@ -137,7 +137,7 @@ public sealed class StateEventTests
     public void ToggleSelectNode_RaisesSelectionChangedEvent()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node);
 
         SelectionChangedEventArgs? raisedArgs = null;
@@ -155,7 +155,7 @@ public sealed class StateEventTests
     public void ClearSelection_RaisesSelectionChangedEvent()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         state.AddNode(node);
         state.SelectNode("n1");
 
@@ -234,7 +234,7 @@ public sealed class StateEventTests
     public void MultipleSubscribers_AllReceiveEvents()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
 
         var subscriber1Called = false;
         var subscriber2Called = false;
@@ -252,7 +252,7 @@ public sealed class StateEventTests
     public void UnsubscribedHandlers_DoNotReceiveEvents()
     {
         var state = new NodeEditorState();
-        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var node = new NodeViewModel(new NodeData("n1", "Test", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
 
         var eventRaised = false;
         EventHandler<NodeEventArgs> handler = (sender, args) => eventRaised = true;

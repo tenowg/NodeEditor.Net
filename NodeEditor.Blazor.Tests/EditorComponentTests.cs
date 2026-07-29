@@ -12,7 +12,7 @@ public sealed class EditorComponentTests : BunitContext
     public void TextEditor_InputUpdatesSocketValue()
     {
         var socketVm = new SocketViewModel(new SocketData("Text", typeof(string).FullName ?? "System.String", true, false));
-        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         var context = new SocketEditorContext
         {
             Socket = socketVm,
@@ -30,7 +30,7 @@ public sealed class EditorComponentTests : BunitContext
     public void NumericEditor_InputUpdatesSocketValue()
     {
         var socketVm = new SocketViewModel(new SocketData("Value", "int", true, false));
-        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         var context = new SocketEditorContext
         {
             Socket = socketVm,
@@ -48,7 +48,7 @@ public sealed class EditorComponentTests : BunitContext
     public void BoolEditor_CheckboxUpdatesSocketValue()
     {
         var socketVm = new SocketViewModel(new SocketData("Flag", "bool", true, false));
-        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
         var context = new SocketEditorContext
         {
             Socket = socketVm,

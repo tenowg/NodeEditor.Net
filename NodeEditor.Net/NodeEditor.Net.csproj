@@ -16,4 +16,7 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.10" />
   </ItemGroup>
 
+  <ItemGroup>
+	<ProjectReference Include="..\NodeEditor.SourceGenerator\NodeEditor.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
 </Project>

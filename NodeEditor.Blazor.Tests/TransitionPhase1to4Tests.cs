@@ -325,9 +325,10 @@ public sealed class TransitionPhase1to4Tests
             "TestName",
             "TestCategory",
             "TestDescription",
+            false,
             Array.Empty<SocketData>(),
             Array.Empty<SocketData>(),
-            () => new NodeData("1", "TestName", false, false,
+            () => new NodeData("1", "TestName", false, false, false,
                 Array.Empty<SocketData>(), Array.Empty<SocketData>()));
 
         Assert.Null(def.NodeType);
@@ -346,9 +347,10 @@ public sealed class TransitionPhase1to4Tests
             Name: "FullNode",
             Category: "Cat",
             Description: "Desc",
+            IsReadOnly: false,
             Inputs: Array.Empty<SocketData>(),
             Outputs: Array.Empty<SocketData>(),
-            Factory: () => new NodeData("1", "FullNode", false, false,
+            Factory: () => new NodeData("1", "FullNode", false, false, false,
                 Array.Empty<SocketData>(), Array.Empty<SocketData>()),
             NodeType: typeof(SampleTestNode),
             InlineExecutor: executor,

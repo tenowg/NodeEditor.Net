@@ -71,6 +71,7 @@ public sealed class ComponentHierarchyTests
             Name: "Test Node",
             Callable: true,
             ExecInit: false,
+            IsReadOnly: false,
             Inputs: new List<SocketData>
             {
                 new("Input1", "int", true, false),
@@ -230,6 +231,7 @@ public sealed class ComponentHierarchyTests
             Name: name,
             Callable: id.GetHashCode() % 2 == 0,
             ExecInit: false,
+            IsReadOnly: false,
             Inputs: new List<SocketData>
             {
                 new("Input1", "int", true, false),

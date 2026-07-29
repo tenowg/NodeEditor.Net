@@ -66,6 +66,7 @@ public sealed class NodeComponentRenderTests : BunitContext
             "Node",
             false,
             false,
+            false,
             Array.Empty<SocketData>(),
             Array.Empty<SocketData>()));
 

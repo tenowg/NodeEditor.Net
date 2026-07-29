@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NodeEditor.Net\NodeEditor.Net.csproj" />
+	<ProjectReference Include="..\NodeEditor.SourceGenerator\NodeEditor.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 
