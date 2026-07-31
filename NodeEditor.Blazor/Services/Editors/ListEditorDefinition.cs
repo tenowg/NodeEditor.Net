@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using NodeEditor.Blazor.Components.Editors;
+using NodeEditor.Net.Attributes;
 using NodeEditor.Net.Models;
 
 namespace NodeEditor.Blazor.Services.Editors;

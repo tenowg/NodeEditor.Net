@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Records;
 
 namespace NodeEditor.Net.Services.Serialization;
 
@@ -18,6 +19,7 @@ namespace NodeEditor.Net.Services.Serialization;
 [JsonSerializable(typeof(PluginDependencyDto))]
 [JsonSerializable(typeof(GraphEventDto))]
 [JsonSerializable(typeof(OverlayDto))]
+[JsonSerializable(typeof(CustomEditorHint))]
 public partial class GraphSerializerContext : JsonSerializerContext
 {
 }

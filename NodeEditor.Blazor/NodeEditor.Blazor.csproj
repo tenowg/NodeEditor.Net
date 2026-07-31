@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -17,8 +17,31 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NodeEditor.Net\NodeEditor.Net.csproj" />
-	<ProjectReference Include="..\NodeEditor.SourceGenerator\NodeEditor.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	  <ProjectReference Include="..\NodeEditor.SourceGenerator\NodeEditor.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+
+	<PropertyGroup>
+		<!-- 1. Emits the generated files to a concrete directory on your disk -->
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>GeneratedFiles</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- 2. Prevents compiler from hitting "Duplicate Type" errors from the local disk vs memory -->
+		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+		<Compile Remove="GeneratedFiles\**" />
+		<None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="GeneratedFiles\**" />
+	  <EmbeddedResource Remove="GeneratedFiles\**" />
+	  <None Remove="GeneratedFiles\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Generated\" />
+	</ItemGroup>
 
 </Project>

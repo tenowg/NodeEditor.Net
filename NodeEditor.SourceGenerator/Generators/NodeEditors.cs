@@ -15,15 +15,20 @@ namespace NodeEditor.SourceGenerator.Generators
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            var provider = context.SyntaxProvider.ForAttributeWithMetadataName("NodeEditor.Net.Attributes.NodeCustomEditorAttribute",
-                predicate: static (s, _) => s is ClassDeclarationSyntax,
+            var provider = context.SyntaxProvider.ForAttributeWithMetadataName("NodeEditor.Net.Attributes.NodeEditorHintAttribute",
+                predicate: static (s, _) => s is ClassDeclarationSyntax || s is RecordDeclarationSyntax,
                 transform: (ctx, ct) => BuildIndexModel(ctx, ct))
             .Where(static m => m is not null);
 
             var values = context.AnalyzerConfigOptionsProvider.Select(static (options, _) =>
             {
                 options.GlobalOptions.TryGetValue("build_property.RootNamespace", out var rootNamespace);
-                return rootNamespace ?? "DefaultName";
+                options.GlobalOptions.TryGetValue("build_property.AssemblyName", out var assemblyName);
+                return new PropsModel
+                {
+                    RootNamespace = rootNamespace ?? "DefaultName",
+                    AssemblyName = assemblyName ?? "nothing"
+                };
             });
 
             var combinedProvider = provider.Collect().Combine(values);
@@ -35,7 +40,7 @@ namespace NodeEditor.SourceGenerator.Generators
             ct.ThrowIfCancellationRequested();
 
             var compilation = ctx.SemanticModel.Compilation;
-            var nodeEditorAttrSymbol = compilation.GetTypeByMetadataName("NodeEditor.Net.Attributes.NodeCustomEditorAttribute");
+            var nodeEditorAttrSymbol = compilation.GetTypeByMetadataName("NodeEditor.Net.Attributes.NodeEditorHintAttribute");
 
             var classSymbol = (INamedTypeSymbol)ctx.TargetSymbol;
 
@@ -45,12 +50,16 @@ namespace NodeEditor.SourceGenerator.Generators
             if (nodeCustomEditorAttribute == null) return null;
 
             var hintType = nodeCustomEditorAttribute.ConstructorArguments[0].Value?.ToString();
+            var optionsType = nodeCustomEditorAttribute?.ConstructorArguments[1].Value as INamedTypeSymbol;
 
             if (string.IsNullOrWhiteSpace(hintType)) return null;
 
             return new CustomEditorModel
             {
-                HintTypeName = hintType
+                HintTypeName = hintType ?? string.Empty,
+                OptionsTypeName = optionsType?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? string.Empty,
+                ShortTypeName = optionsType?.Name ?? string.Empty,
+                ContainingNamespace = classSymbol.ContainingNamespace.ToDisplayString() ?? string.Empty,
             };
         }
     }

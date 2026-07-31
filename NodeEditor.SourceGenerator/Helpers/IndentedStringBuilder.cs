@@ -22,6 +22,24 @@ namespace NodeEditor.SourceGenerator.Helpers
             _sb.AppendLine(text);
         }
 
+        public void AppendIndent(string text)
+        {
+            // Only apply indentation if the line isn't empty
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                for (int i = 0; i < _indentLevel; i++)
+                {
+                    _sb.Append(IndentString);
+                }
+            }
+            _sb.Append(text);
+        }
+
+        public void Append(string text)
+        {
+            _sb.Append(text);
+        }
+
         public void AppendLine() => _sb.AppendLine();
 
         // Opens a block, writes the opening character, and bumps indentation

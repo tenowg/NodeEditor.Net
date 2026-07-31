@@ -6,10 +6,8 @@ using NodeEditor.Net.Records;
 
 namespace NodeEditor.Blazor.Services.Editors;
 
-[NodeCustomEditor("Bool")]
 public sealed class BoolEditorDefinition : INodeCustomEditor
 {
-    private CustomEditorRecord _record = CustomEditorRecord.Test;
     public bool CanEdit(SocketData socket)
     {
         if (socket.IsExecution || !socket.IsInput)

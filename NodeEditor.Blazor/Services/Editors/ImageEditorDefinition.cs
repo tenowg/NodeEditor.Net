@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using NodeEditor.Blazor.Components.Editors;
+using NodeEditor.Net.Attributes;
 using NodeEditor.Net.Models;
 
 namespace NodeEditor.Blazor.Services.Editors;
 
+[NodeEditorHint("Image")]
 public sealed class ImageEditorDefinition : INodeCustomEditor
 {
     public bool CanEdit(SocketData socket)
