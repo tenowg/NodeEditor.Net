@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Records;
 using NodeEditor.Net.Services.Registry;
 
 namespace NodeEditor.Net.Services.Execution;
@@ -27,7 +28,10 @@ public interface INodeBuilder
     INodeBuilder ExecutionOutput(string name);
 
     // ── Data sockets ──
-    INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null);
+    //INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null);
+    // Mycode
+    INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null, CustomEditorHint? customEditorHint = null);
+
     INodeBuilder Input(string name, string typeName, SocketValue? defaultValue = null, SocketEditorHint? editorHint = null);
     INodeBuilder Output<T>(string name);
     INodeBuilder Output(string name, string typeName);

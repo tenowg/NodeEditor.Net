@@ -6,6 +6,7 @@ namespace NodeEditor.Net.Services.Serialization;
 
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    Converters = [typeof(CustomEditorHintJsonConverter)],
     WriteIndented = true)]
 [JsonSerializable(typeof(GraphDto))]
 [JsonSerializable(typeof(NodeDto))]

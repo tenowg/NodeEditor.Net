@@ -23,7 +23,7 @@ namespace NodeEditor.SourceGenerator.Generators
 
                 var sb = $@"
 namespace {model!.ContainingNamespace};
-public sealed class CustomEditorHintDropdownOptionsConverter
+public sealed class CustomEditorHint{model.HintTypeName}OptionsConverter
     : global::System.Text.Json.Serialization.JsonConverter<global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}>>
 {{
     public override global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}> Read(
@@ -41,7 +41,7 @@ public sealed class CustomEditorHintDropdownOptionsConverter
             editorHint = hintProp.GetString();
 
         if (root.TryGetProperty(""metadata"", out var metaProp))
-            metadata = global::System.Text.Json.JsonSerializer.Deserialize<DropdownOptions>(metaProp.GetRawText(), options);
+            metadata = global::System.Text.Json.JsonSerializer.Deserialize<{model.OptionsTypeName}>(metaProp.GetRawText(), options);
 
         return new global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}>(editorHint!, metadata!);
     }}
@@ -79,6 +79,16 @@ public sealed class CustomEditorHintDropdownOptionsConverter
                             initializer.AppendLine("global::NodeEditor.Net.Services.Serialization.CustomEditorHintRegistry.Register(");
                             initializer.AppendLine($"    \"{model.HintTypeName}\",");
                             initializer.AppendLine($"new global::{model.ContainingNamespace}.CustomEditorHint{model.HintTypeName}OptionsConverter());");
+                        }
+                    }
+
+
+                    initializer.AppendLine("extension(global::NodeEditor.Net.Records.CustomEditorHint hint)");
+                    using (initializer.Block())
+                    {
+                        foreach (var model in models)
+                        {
+                            initializer.AppendLine($"public static global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}> {model.HintTypeName}({model.OptionsTypeName}? defaultValue = null) => new global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}>(\"Bool\", defaultValue ?? new {model.OptionsTypeName}());");
                         }
                     }
                 }

@@ -1,3 +1,5 @@
+using NodeEditor.Net.Records;
+
 namespace NodeEditor.Net.Models;
 
 public sealed record class SocketData(
@@ -6,5 +8,6 @@ public sealed record class SocketData(
     bool IsInput,
     bool IsExecution,
     SocketValue? Value = null,
-    SocketEditorHint? EditorHint = null
+    SocketEditorHint? EditorHint = null,
+    CustomEditorHint? CustomEditor = null
 );

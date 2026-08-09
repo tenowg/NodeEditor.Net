@@ -1,25 +1,35 @@
 ﻿using NodeEditor.Net.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Net.Security;
 using System.Text;
 using System.Text.Json.Serialization;
 
 namespace NodeEditor.Blazor.Services.Editors
 {
-    //[NodeEditorHint("Bool")]
-
-    //[NodeEditorHint("Button")]
-    [NodeEditorHint("Dropdown", typeof(DropdownOptions))]
-    public record DropdownOptions(List<string> options)
-    {
-        public List<string> options { get; init; } = options;
+    [NodeEditorHint("Bool", typeof(BoolOption))]
+    public record BoolOption(string? test = null) {
+        public string? test = test;
     }
 
-    //[NodeEditorHint("Image")]
+    [NodeEditorHint("Button", typeof(ButtonOptions))]
+    public record ButtonOptions { }
 
-    [JsonSourceGenerationOptions(
-    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
-    WriteIndented = true)]
-    [JsonSerializable(typeof(DropdownOptions))]
-    public partial class NodeEditorNetBlazerOptionsContext : JsonSerializerContext { }
+    [NodeEditorHint("Dropdown", typeof(DropdownOptions))]
+    public record DropdownOptions(List<string>? options = null)
+    {
+        public List<string>? options { get; init; } = options;
+    }
+
+    [NodeEditorHint("Image", typeof(ImageOptions))]
+    public record ImageOptions { }
+
+    //[JsonSourceGenerationOptions(
+    //PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    //WriteIndented = true)]
+    //[JsonSerializable(typeof(DropdownOptions))]
+    //[JsonSerializable(typeof(BoolOption))]
+    //[JsonSerializable(typeof(ButtonOptions))]
+    //[JsonSerializable(typeof(ImageOptions))]
+    //public partial class NodeEditorNetBlazerOptionsContext : JsonSerializerContext { }
 }

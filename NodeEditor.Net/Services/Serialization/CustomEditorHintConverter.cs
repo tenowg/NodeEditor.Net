@@ -18,9 +18,16 @@ namespace NodeEditor.Net.Services.Serialization
         {
             using var document = JsonDocument.ParseValue(ref reader);
 
-            return CustomEditorHintRegistry.Deserialize(
-                document.RootElement,
-                options);
+            try
+            {
+                return CustomEditorHintRegistry.Deserialize(
+                    document.RootElement,
+                    options);
+            }
+            catch (Exception)
+            {
+                return CustomEditorHint.Error;
+            }
         }
 
         public override void Write(

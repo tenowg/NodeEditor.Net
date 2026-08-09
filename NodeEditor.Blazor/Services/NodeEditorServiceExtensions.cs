@@ -119,6 +119,7 @@ public static class NodeEditorServiceExtensions
         services.AddSingleton<Editors.INodeCustomEditor, Editors.NumericEditorDefinition>();
         services.AddSingleton<Editors.INodeCustomEditor, Editors.BoolEditorDefinition>();
         services.AddSingleton<Editors.INodeCustomEditor, Editors.ListEditorDefinition>();
+        services.AddSingleton<Editors.INodeCustomEditor, Editors.ErrorNodeEditor>();
         services.AddSingleton<Editors.NodeEditorCustomEditorRegistry>();
 
         // Execution services
@@ -139,7 +140,7 @@ public static class NodeEditorServiceExtensions
         services.AddScoped<EventNodeFactory>();
 
         // Register options
-        CustomEditorHintRegistry.Register(NodeEditorNetBlazerOptionsContext.Default);
+        //CustomEditorHintRegistry.Register(NodeEditorNetBlazerOptionsContext.Default);
         services.AddSingleton(CustomEditorHintRegistry.CreateOptions());
 
         return services;
