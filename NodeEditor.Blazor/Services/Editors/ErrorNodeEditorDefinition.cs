@@ -8,7 +8,7 @@ using System.Text;
 
 namespace NodeEditor.Blazor.Services.Editors
 {
-    internal class ErrorNodeEditor : INodeCustomEditor
+    internal class ErrorNodeEditorDefinition : INodeCustomEditor
     {
         public bool CanEdit(SocketData socket)
         {

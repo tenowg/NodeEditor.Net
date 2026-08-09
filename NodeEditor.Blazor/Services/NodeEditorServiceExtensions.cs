@@ -119,7 +119,7 @@ public static class NodeEditorServiceExtensions
         services.AddSingleton<Editors.INodeCustomEditor, Editors.NumericEditorDefinition>();
         services.AddSingleton<Editors.INodeCustomEditor, Editors.BoolEditorDefinition>();
         services.AddSingleton<Editors.INodeCustomEditor, Editors.ListEditorDefinition>();
-        services.AddSingleton<Editors.INodeCustomEditor, Editors.ErrorNodeEditor>();
+        services.AddSingleton<Editors.INodeCustomEditor, Editors.ErrorNodeEditorDefinition>();
         services.AddSingleton<Editors.NodeEditorCustomEditorRegistry>();
 
         // Execution services
