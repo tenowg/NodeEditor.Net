@@ -21,7 +21,7 @@ public sealed class SocketComponentEditorTests : BunitContext
     public void SocketComponent_RendersEditorWhenInputNotConnected()
     {
         var socketVm = new SocketViewModel(new SocketData("Text", "string", true, false));
-        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
 
         var cut = Render<SocketComponent>(parameters => parameters
             .Add(p => p.Socket, socketVm)
@@ -36,7 +36,7 @@ public sealed class SocketComponentEditorTests : BunitContext
     public void SocketComponent_HidesEditorWhenInputConnected()
     {
         var socketVm = new SocketViewModel(new SocketData("Text", "string", true, false));
-        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        var nodeVm = new NodeViewModel(new NodeData("n1", "Node", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
 
         var cut = Render<SocketComponent>(parameters => parameters
             .Add(p => p.Socket, socketVm)

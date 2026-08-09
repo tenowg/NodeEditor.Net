@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using NodeEditor.Net.Models;
 using NodeEditor.Net.Services.Registry;
 
@@ -9,12 +10,24 @@ namespace NodeEditor.Net.Services;
 /// </summary>
 public sealed class VariableNodeFactory
 {
-    private readonly INodeRegistryService _registry;
+    private IServiceProvider _serviceProvider;
+    private INodeRegistryService? _registry;
+    private INodeRegistryService Registry
+    {
+        get
+        {
+            if (_registry is not null) return _registry;
+            _registry = _state.NodeRegistryKey is not null ? 
+                _serviceProvider.GetRequiredKeyedService<INodeRegistryService>(_state.NodeRegistryKey) 
+                : _serviceProvider.GetRequiredService<INodeRegistryService>();
+            return _registry;
+        }
+    }
     private readonly INodeEditorState _state;
 
-    public VariableNodeFactory(INodeRegistryService registry, INodeEditorState state)
+    public VariableNodeFactory(INodeEditorState state, IServiceProvider services)
     {
-        _registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        _serviceProvider = services;
         _state = state ?? throw new ArgumentNullException(nameof(state));
 
         _state.VariableAdded += OnVariableAdded;
@@ -48,7 +61,7 @@ public sealed class VariableNodeFactory
     {
         var getDefinition = BuildGetDefinition(variable);
         var setDefinition = BuildSetDefinition(variable);
-        _registry.RegisterDefinitions(new[] { getDefinition, setDefinition });
+        Registry.RegisterDefinitions(new[] { getDefinition, setDefinition });
     }
 
     private void UnregisterVariableDefinitions(GraphVariable variable)
@@ -59,10 +72,10 @@ public sealed class VariableNodeFactory
         // Build stubs with matching IDs so RemoveDefinitions can find them
         var stubs = new[]
         {
-            new NodeDefinition(getDefId, "", "", "", Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!),
-            new NodeDefinition(setDefId, "", "", "", Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!)
+            new NodeDefinition(getDefId, "", "", "", false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!),
+            new NodeDefinition(setDefId, "", "", "", false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), () => null!)
         };
-        _registry.RemoveDefinitions(stubs);
+        Registry.RemoveDefinitions(stubs);
     }
 
     /// <summary>
@@ -78,16 +91,18 @@ public sealed class VariableNodeFactory
 
         return new NodeDefinition(
             Id: variable.GetDefinitionId,
-            Name: "Get " + variable.Name,
+            Name: $"Get Variable ({variable.Name})",
             Category: "Variables",
             Description: $"Gets the current value of variable '{variable.Name}'.",
+            IsReadOnly: variable.IsReadOnly,
             Inputs: Array.Empty<SocketData>(),
             Outputs: outputs,
             Factory: () => new NodeData(
                 Id: Guid.NewGuid().ToString("N"),
-                Name: "Get " + variable.Name,
+                Name: $"Get Variable ({variable.Name})",
                 Callable: false,
                 ExecInit: false,
+                IsReadOnly: variable.IsReadOnly,
                 Inputs: Array.Empty<SocketData>(),
                 Outputs: outputs,
                 DefinitionId: variable.GetDefinitionId));
@@ -114,16 +129,18 @@ public sealed class VariableNodeFactory
 
         return new NodeDefinition(
             Id: variable.SetDefinitionId,
-            Name: "Set " + variable.Name,
+            Name: $"Set Variable ({variable.Name})",
             Category: "Variables",
             Description: $"Sets the value of variable '{variable.Name}'.",
+            IsReadOnly: variable.IsReadOnly,
             Inputs: inputs,
             Outputs: outputs,
             Factory: () => new NodeData(
                 Id: Guid.NewGuid().ToString("N"),
-                Name: "Set " + variable.Name,
+                Name: $"Set Variable({variable.Name})",
                 Callable: true,
                 ExecInit: false,
+                IsReadOnly: variable.IsReadOnly,
                 Inputs: inputs,
                 Outputs: outputs,
                 DefinitionId: variable.SetDefinitionId));

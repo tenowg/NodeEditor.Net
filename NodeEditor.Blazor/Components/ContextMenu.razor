@@ -1,4 +1,4 @@
-@inject INodeRegistryService Registry
+@inject INodeRegistryService InjectedRegistry
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 @implements IAsyncDisposable
@@ -76,6 +76,12 @@
     private bool _positionPending;
     private ContextMenuSearch? _searchRef;
     private readonly List<NodeCategoryGroup> _categoryStack = new();
+
+    // My edits
+    [CascadingParameter]
+    public INodeRegistryService? CascadedRegistry { get; set; }
+
+    private INodeRegistryService Registry => CascadedRegistry ?? InjectedRegistry;
 
     [Parameter]
     public bool IsOpen { get; set; }

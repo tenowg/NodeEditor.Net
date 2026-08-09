@@ -14,6 +14,8 @@ public sealed record class GraphDto(
 public sealed record class NodeDto(
     string Id,
     string? TypeId,
+    string? HelpTypeId,
+    bool IsReadOnly,
     string Name,
     bool Callable,
     bool ExecInit,
@@ -42,6 +44,7 @@ public sealed record class GraphVariableDto(
     string Id,
     string Name,
     string TypeName,
+    bool IsReadOnly,
     SocketValue? DefaultValue = null);
 
 public sealed record class PluginDependencyDto(

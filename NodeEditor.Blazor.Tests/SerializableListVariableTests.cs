@@ -5,6 +5,8 @@ using NodeEditor.Net.Services;
 using NodeEditor.Net.Services.Infrastructure;
 using NodeEditor.Blazor.Services.Editors;
 using NodeEditor.Net.Services.Execution;
+using Microsoft.Extensions.DependencyInjection;
+using NodeEditor.Net.Services.Registry;
 
 namespace NodeEditor.Blazor.Tests;
 
@@ -347,15 +349,20 @@ public sealed class SerializableListVariableTests
     public void VariableNodeFactory_RegistersGetAndSetForListVariable()
     {
         var state = new NodeEditorState();
-        var registry = new NodeEditor.Net.Services.Registry.NodeRegistryService(
-            new NodeEditor.Net.Services.Registry.NodeDiscoveryService());
-        registry.EnsureInitialized(Array.Empty<System.Reflection.Assembly>());
 
-        var factory = new VariableNodeFactory(registry, state);
+        var services = new ServiceCollection();
+        services.AddSingleton<INodeRegistryService, NodeRegistryService>();
+        services.AddSingleton<NodeDiscoveryService>();
+        var serviceProvider = services.BuildServiceProvider();
+
+        var registry = serviceProvider.GetService<INodeRegistryService>();
+        registry!.EnsureInitialized(Array.Empty<System.Reflection.Assembly>());
+        
+        var factory = new VariableNodeFactory(state, serviceProvider);
 
         var variable = GraphVariable.Create(
             "MyList",
-            typeof(SerializableList).FullName!,
+            typeof(SerializableList),
             SocketValue.FromObject(new SerializableList()));
 
         state.AddVariable(variable);
@@ -383,14 +390,17 @@ public sealed class SerializableListVariableTests
     public void VariableNodeFactory_UpdatesDefinitionsOnTypeChange()
     {
         var state = new NodeEditorState();
-        var registry = new NodeEditor.Net.Services.Registry.NodeRegistryService(
-            new NodeEditor.Net.Services.Registry.NodeDiscoveryService());
-        registry.EnsureInitialized(Array.Empty<System.Reflection.Assembly>());
+        var services = new ServiceCollection();
+        services.AddSingleton<INodeRegistryService, NodeRegistryService>();
+        services.AddSingleton<NodeDiscoveryService>();
+        var serviceProvider = services.BuildServiceProvider();
+        var registry = serviceProvider.GetService<INodeRegistryService>();
+        registry!.EnsureInitialized(Array.Empty<System.Reflection.Assembly>());
 
-        var factory = new VariableNodeFactory(registry, state);
+        var factory = new VariableNodeFactory(state, serviceProvider);
 
         // Start as int
-        var variable = GraphVariable.Create("Counter", typeof(int).FullName!, SocketValue.FromObject(0));
+        var variable = GraphVariable.Create("Counter", typeof(int), SocketValue.FromObject(0));
         state.AddVariable(variable);
 
         var getDef = registry.Definitions.FirstOrDefault(d => d.Id == variable.GetDefinitionId);
@@ -417,7 +427,7 @@ public sealed class SerializableListVariableTests
     [Fact]
     public void VariableNodeExecutor_GetNode_ReturnsSeededList()
     {
-        var variable = GraphVariable.Create("Items", typeof(SerializableList).FullName!);
+        var variable = GraphVariable.Create("Items", typeof(SerializableList));
         var list = new SerializableList();
         list.Add("a");
         list.Add("b");
@@ -430,6 +440,7 @@ public sealed class SerializableListVariableTests
             Name: "Get Items",
             Callable: false,
             ExecInit: false,
+            IsReadOnly: false,
             Inputs: Array.Empty<SocketData>(),
             Outputs: new[] { new SocketData("Value", typeof(SerializableList).FullName!, false, false) },
             DefinitionId: variable.GetDefinitionId);
@@ -444,7 +455,7 @@ public sealed class SerializableListVariableTests
     [Fact]
     public void VariableNodeExecutor_SetNode_UpdatesVariable()
     {
-        var variable = GraphVariable.Create("Items", typeof(SerializableList).FullName!);
+        var variable = GraphVariable.Create("Items", typeof(SerializableList));
         var context = new NodeRuntimeStorage();
         context.SetVariable(variable.Id, new SerializableList());
 
@@ -459,6 +470,7 @@ public sealed class SerializableListVariableTests
             Name: "Set Items",
             Callable: true,
             ExecInit: false,
+            IsReadOnly: false,
             Inputs: new[]
             {
                 new SocketData("Enter", ExecutionSocket.TypeName, true, true),
@@ -494,7 +506,7 @@ public sealed class SerializableListVariableTests
 
         var variable = GraphVariable.Create(
             "MyList",
-            typeof(SerializableList).FullName!,
+            typeof(SerializableList),
             SocketValue.FromObject(list));
 
         state.AddVariable(variable);

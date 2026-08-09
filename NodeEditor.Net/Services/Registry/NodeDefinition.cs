@@ -12,9 +12,11 @@ public sealed record class NodeDefinition(
     string Name,
     string Category,
     string Description,
+    bool IsReadOnly,
     IReadOnlyList<SocketData> Inputs,
     IReadOnlyList<SocketData> Outputs,
     Func<NodeData> Factory,
     Type? NodeType = null,
     Func<INodeExecutionContext, CancellationToken, Task>? InlineExecutor = null,
-    IReadOnlyList<StreamSocketInfo>? StreamSockets = null);
+    IReadOnlyList<StreamSocketInfo>? StreamSockets = null,
+    Type? HelpComponent = null);

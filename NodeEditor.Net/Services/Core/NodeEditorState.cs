@@ -209,9 +209,11 @@ public class NodeEditorState : INodeEditorState
                 node.Data.Name,
                 node.Data.Callable,
                 node.Data.ExecInit,
+                node.Data.IsReadOnly,
                 node.Inputs.Select(socket => socket.Data).ToList(),
                 node.Outputs.Select(socket => socket.Data).ToList(),
-                node.Data.DefinitionId))
+                node.Data.DefinitionId,
+                node.Data.HelpDefinitionId))
             .ToList();
     }
 
@@ -226,9 +228,11 @@ public class NodeEditorState : INodeEditorState
                 vm.Data.Name,
                 vm.Data.Callable,
                 vm.Data.ExecInit,
+                vm.Data.IsReadOnly,
                 vm.Inputs.Select(socket => socket.Data).ToList(),
                 vm.Outputs.Select(socket => socket.Data).ToList(),
-                vm.Data.DefinitionId),
+                vm.Data.DefinitionId,
+                vm.Data.HelpDefinitionId),
             vm.Position,
             vm.Size)).ToList();
 
@@ -453,6 +457,8 @@ public class NodeEditorState : INodeEditorState
             }
         }
     }
+
+    public object? NodeRegistryKey { get; set; }
 
     /// <summary>
     /// Adds a node to the graph and raises the <see cref="NodeAdded"/> event.
@@ -917,9 +923,13 @@ public class NodeEditorState : INodeEditorState
     /// <summary>
     /// Adds a graph variable.
     /// </summary>
-    public void AddVariable(GraphVariable variable)
+    public void AddVariable(GraphVariable variable, bool failOnDuplicateName = false)
     {
-        if (variable is null) throw new ArgumentNullException(nameof(variable));
+        ArgumentNullException.ThrowIfNull(variable);
+        if (failOnDuplicateName && Variables.Any(x => x.Name == variable.Name))
+        {
+            return;
+        }
         Variables.Add(variable);
         VariableAdded?.Invoke(this, new GraphVariableEventArgs(variable));
     }

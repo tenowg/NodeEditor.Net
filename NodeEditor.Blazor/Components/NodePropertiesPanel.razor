@@ -9,7 +9,7 @@
     @onmousemove="OnPanelMouseMove"
     @onmouseup="OnPanelMouseUp"
     @onmouseleave="OnPanelMouseUp">
-    <div class="ne-properties-header ne-panel-drag-handle"
+    <div class="ne-properties-header @(IsDragable ? "ne-panel-drag-handle" : "")"
         @onmousedown="OnPanelMouseDown"
         @onmousedown:preventDefault
         @onmousedown:stopPropagation>
@@ -89,6 +89,9 @@
     [Parameter, EditorRequired]
     public INodeEditorState State { get; set; } = null!;
 
+    [Parameter]
+    public bool IsDragable { get; set; } = true;
+
     private NodeViewModel? _selectedNode;
 
     private bool _isDraggingPanel;
@@ -133,6 +136,7 @@
 
     private void OnPanelMouseDown(MouseEventArgs e)
     {
+        if (!IsDragable) return;
         _isDraggingPanel = true;
         _panelDragMoved = false;
         _panelDragStartScreen = new Point2D(e.ClientX, e.ClientY);

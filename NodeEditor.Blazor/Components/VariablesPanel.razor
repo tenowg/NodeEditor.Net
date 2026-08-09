@@ -1,6 +1,8 @@
 @using NodeEditor.Net.Models
 @using NodeEditor.Blazor.Services.Editors
 @using NodeEditor.Net.ViewModels
+@* This just needs to be loaded, do not remove *@
+@inject VariableNodeFactory VariableNodeFactory 
 @implements IDisposable
 
 @inject NodeEditorCustomEditorRegistry EditorRegistry
@@ -10,7 +12,7 @@
     @onmousemove="OnPanelMouseMove"
     @onmouseup="OnPanelMouseUp"
     @onmouseleave="OnPanelMouseUp">
-    <div class="ne-variables-header ne-panel-drag-handle"
+    <div class="ne-variables-header @(IsDraggable ? "ne-panel-drag-handle" : "")"
         @onmousedown="OnPanelMouseDown"
         @onmousedown:preventDefault
         @onmousedown:stopPropagation
@@ -78,11 +80,12 @@
                     else
                     {
                         <span class="ne-variables-name" @ondblclick="@(() => StartEdit(variable))">
-                            @variable.Name
+                            @variable.Name @(variable.IsReadOnly ? "(ReadOnly)" : "")
                         </span>
                     }
 
                     <select class="ne-variables-select ne-variables-select--inline"
+                        disabled = "@variable.IsReadOnly"
                             @onchange="@(e => OnVariableTypeChanged(variable, e?.Value?.ToString()))">
                         <option value="System.Double" selected="@(variable.TypeName == "System.Double")">Number</option>
                         <option value="System.Int32" selected="@(variable.TypeName == "System.Int32")">Integer</option>
@@ -103,17 +106,19 @@
                     <button class="ne-variables-node-btn ne-variables-node-btn--set"
                             @onclick="@(() => CreateVariableNode(variable, true))"
                             @onclick:stopPropagation="true"
+                            disabled="@variable.IsReadOnly"
                             title="Create Set node">S</button>
 
                     <button class="ne-variables-delete-btn"
+                            disabled = "@variable.IsReadOnly"
                             @onclick="@(() => DeleteVariable(variable.Id))"
                             @onclick:stopPropagation="true"
                             title="Delete variable">✕</button>
                 </div>
 
-                <div class="ne-variables-editor">
-                    @RenderVariableEditor(variable)
-                </div>
+                    <div class="ne-variables-editor">
+                        @RenderVariableEditor(variable)
+                    </div>
             }
         </div>
     }
@@ -132,6 +137,9 @@
 
     [Parameter]
     public EventCallback<VariableNodeRequest> OnCreateVariableNode { get; set; }
+
+    [Parameter]
+    public bool IsDraggable { get; set; } = true;
 
     private bool _isCollapsed;
     private bool _isAddingNew;
@@ -169,6 +177,7 @@
 
     private void OnPanelMouseDown(MouseEventArgs e)
     {
+        if (!IsDraggable) return;
         _isDraggingPanel = true;
         _panelDragMoved = false;
         _panelDragStartScreen = new Point2D(e.ClientX, e.ClientY);
@@ -230,7 +239,7 @@
         }
 
         var defaultValue = GetDefaultValueForType(_newVariableType);
-        var variable = GraphVariable.Create(name, _newVariableType, defaultValue);
+        var variable = GraphVariable.Create(name, _newVariableType, defaultValue, false);
         State.AddVariable(variable);
 
         _isAddingNew = false;
@@ -246,6 +255,7 @@
 
     private void StartEdit(GraphVariable variable)
     {
+        if (variable.IsReadOnly) return;
         _editingVariableId = variable.Id;
         _editVariableName = variable.Name;
     }
@@ -255,7 +265,7 @@
         if (_editingVariableId is null) return;
 
         var variable = State.FindVariable(_editingVariableId);
-        if (variable is null) { _editingVariableId = null; return; }
+        if (variable is null || variable.IsReadOnly) { _editingVariableId = null; return; }
 
         var newName = _editVariableName?.Trim();
         if (string.IsNullOrWhiteSpace(newName))
@@ -357,6 +367,7 @@
             Name: "Variable",
             Callable: false,
             ExecInit: false,
+            IsReadOnly: variable.IsReadOnly,
             Inputs: new[] { socketData },
             Outputs: Array.Empty<SocketData>());
 
@@ -369,15 +380,15 @@
         }
 
         var context = new SocketEditorContext
-        {
-            Socket = socketVm,
-            Node = nodeVm,
-            SetValue = value =>
             {
-                var updated = variable with { DefaultValue = SocketValue.FromObject(value) };
-                State.UpdateVariable(updated);
-            }
-        };
+                Socket = socketVm,
+                Node = nodeVm,
+                SetValue = value =>
+                {
+                    var updated = variable with { DefaultValue = SocketValue.FromObject(value) };
+                    State.UpdateVariable(updated);
+                }
+            };
 
         return editor.Render(context);
     }

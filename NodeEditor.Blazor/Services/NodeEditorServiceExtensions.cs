@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using NodeEditor.Blazor.Services.Editors;
 using NodeEditor.Net.Adapters;
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Records;
 using NodeEditor.Net.Services;
 using NodeEditor.Net.Services.Execution;
 using NodeEditor.Net.Services.Infrastructure;
@@ -9,6 +11,7 @@ using NodeEditor.Net.Services.Plugins;
 using NodeEditor.Net.Services.Plugins.Marketplace;
 using NodeEditor.Net.Services.Registry;
 using NodeEditor.Net.Services.Serialization;
+using System.Text.Json;
 
 namespace NodeEditor.Blazor.Services;
 
@@ -116,6 +119,7 @@ public static class NodeEditorServiceExtensions
         services.AddSingleton<Editors.INodeCustomEditor, Editors.NumericEditorDefinition>();
         services.AddSingleton<Editors.INodeCustomEditor, Editors.BoolEditorDefinition>();
         services.AddSingleton<Editors.INodeCustomEditor, Editors.ListEditorDefinition>();
+        services.AddSingleton<Editors.INodeCustomEditor, Editors.ErrorNodeEditorDefinition>();
         services.AddSingleton<Editors.NodeEditorCustomEditorRegistry>();
 
         // Execution services
@@ -134,6 +138,10 @@ public static class NodeEditorServiceExtensions
 
         // Event node factory (bridges graph events to node definitions)
         services.AddScoped<EventNodeFactory>();
+
+        // Register options
+        //CustomEditorHintRegistry.Register(NodeEditorNetBlazerOptionsContext.Default);
+        services.AddSingleton(CustomEditorHintRegistry.CreateOptions());
 
         return services;
     }

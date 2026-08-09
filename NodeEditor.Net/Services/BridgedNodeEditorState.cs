@@ -208,6 +208,7 @@ public sealed class BridgedNodeEditorState : INodeEditorState
     // ── Viewport ────────────────────────────────────────────────────────
     public double Zoom { get => State.Zoom; set => Dispatch(() => State.Zoom = value); }
     public Rect2D Viewport { get => State.Viewport; set => Dispatch(() => State.Viewport = value); }
+    public object? NodeRegistryKey { get => State.NodeRegistryKey; set => State.NodeRegistryKey = value; }
 
     // ── Execution bridge ────────────────────────────────────────────────
     public IReadOnlyList<NodeData> BuildExecutionNodes() => State.BuildExecutionNodes();
@@ -254,7 +255,7 @@ public sealed class BridgedNodeEditorState : INodeEditorState
     public void RequestRedo() => Dispatch(() => State.RequestRedo());
 
     // ── Variables ───────────────────────────────────────────────────────
-    public void AddVariable(GraphVariable variable) => Dispatch(() => State.AddVariable(variable));
+    public void AddVariable(GraphVariable variable, bool failOnDuplicateName) => Dispatch(() => State.AddVariable(variable, failOnDuplicateName));
     public void RemoveVariable(string variableId) => Dispatch(() => State.RemoveVariable(variableId));
     public void UpdateVariable(GraphVariable updated) => Dispatch(() => State.UpdateVariable(updated));
     public GraphVariable? FindVariable(string variableId) => State.FindVariable(variableId);

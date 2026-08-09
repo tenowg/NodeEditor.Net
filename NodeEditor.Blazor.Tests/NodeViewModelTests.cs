@@ -13,6 +13,7 @@ public sealed class NodeViewModelTests
             "Test",
             false,
             false,
+            false,
             new[] { new SocketData("In", "System.Int32", true, false) },
             new[] { new SocketData("Out", "System.Int32", false, false) });
 

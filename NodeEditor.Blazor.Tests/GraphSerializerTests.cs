@@ -30,6 +30,7 @@ public sealed class GraphSerializerTests
             "Add",
             false,
             false,
+            false,
             node1Inputs,
             node1Outputs,
             "Test.Context.Add(System.Int32)"))
@@ -50,6 +51,7 @@ public sealed class GraphSerializerTests
         var node2 = new NodeViewModel(new NodeData(
             "node-2",
             "Multiply",
+            false,
             false,
             false,
             node2Inputs,
@@ -103,6 +105,8 @@ public sealed class GraphSerializerTests
         var nodeDto = new NodeDto(
             "node-1",
             "Test.Context.Add(System.Int32)",
+            "Help",
+            false,
             "Add",
             false,
             false,
@@ -183,6 +187,7 @@ public sealed class GraphSerializerTests
                         "Add",
                         false,
                         false,
+                        false,
                         nodeInputs,
                         nodeOutputs,
                         "Test.Context.Add(System.Int32)"),
@@ -239,6 +244,8 @@ public sealed class GraphSerializerTests
         var nodeDto = new NodeDto(
             "node-1",
             oldDefId,
+            "help",
+            false,
             "Start",
             true,
             true,
@@ -273,17 +280,19 @@ public sealed class GraphSerializerTests
                 "Add",
                 "Test",
                 string.Empty,
+                false,
                 Array.Empty<SocketData>(),
                 Array.Empty<SocketData>(),
-                () => new NodeData("test-add", "Add", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), "Test.Context.Add(System.Int32)")),
+                () => new NodeData("test-add", "Add", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), "Test.Context.Add(System.Int32)")),
             new NodeDefinition(
                 "Test.Context.Multiply(System.Int32)",
                 "Multiply",
                 "Test",
                 string.Empty,
+                false,
                 Array.Empty<SocketData>(),
                 Array.Empty<SocketData>(),
-                () => new NodeData("test-multiply", "Multiply", false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), "Test.Context.Multiply(System.Int32)"))
+                () => new NodeData("test-multiply", "Multiply", false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>(), "Test.Context.Multiply(System.Int32)"))
         });
 
         var resolver = new SocketTypeResolver();

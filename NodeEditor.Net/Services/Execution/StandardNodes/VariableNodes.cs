@@ -8,6 +8,8 @@ namespace NodeEditor.Net.Services.Execution.StandardNodes;
 /// </summary>
 public sealed class GetVariableNode : NodeBase
 {
+    public string? id { get; set; }
+
     public override void Configure(INodeBuilder builder)
     {
         builder.Name("Get Variable").Category("Variables")

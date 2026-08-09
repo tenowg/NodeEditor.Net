@@ -15,17 +15,20 @@ public sealed class GraphSerializer : IGraphSerializer
     private readonly IConnectionValidator _connectionValidator;
     private readonly GraphSchemaMigrator _migrator;
     private readonly IPluginLoader? _pluginLoader;
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     public GraphSerializer(
         INodeRegistryService registry,
         IConnectionValidator connectionValidator,
         GraphSchemaMigrator migrator,
+        JsonSerializerOptions serializerOptions,
         IPluginLoader? pluginLoader = null)
     {
         _registry = registry ?? throw new ArgumentNullException(nameof(registry));
         _connectionValidator = connectionValidator ?? throw new ArgumentNullException(nameof(connectionValidator));
         _migrator = migrator ?? throw new ArgumentNullException(nameof(migrator));
         _pluginLoader = pluginLoader;
+        _jsonSerializerOptions = serializerOptions;
     }
 
     public GraphData ExportToGraphData(INodeEditorState state)
@@ -185,7 +188,7 @@ public sealed class GraphSerializer : IGraphSerializer
             throw new ArgumentNullException(nameof(dto));
         }
 
-        return JsonSerializer.Serialize(dto, GraphSerializerContext.Default.GraphDto);
+        return JsonSerializer.Serialize(dto, _jsonSerializerOptions); // GraphSerializerContext.Default.GraphDto);
     }
 
     public GraphDto Deserialize(string json)
@@ -195,13 +198,22 @@ public sealed class GraphSerializer : IGraphSerializer
             throw new ArgumentException("JSON payload is required.", nameof(json));
         }
 
-        var dto = JsonSerializer.Deserialize(json, GraphSerializerContext.Default.GraphDto);
-        if (dto is null)
+        //var dto = JsonSerializer.Deserialize(json, GraphSerializerContext.Default.GraphDto);
+        try
         {
-            throw new JsonException("Unable to deserialize graph JSON.");
-        }
+            var dto = JsonSerializer.Deserialize<GraphDto>(json, _jsonSerializerOptions);
 
-        return dto;
+            if (dto is null)
+            {
+                throw new JsonException("Unable to deserialize graph JSON.");
+            }
+
+            return dto;
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 
     private GraphNodeData CreateGraphNodeData(NodeDto dto, List<string> warnings)
@@ -229,9 +241,11 @@ public sealed class GraphSerializer : IGraphSerializer
             dto.Name,
             dto.Callable,
             dto.ExecInit,
+            dto.IsReadOnly,
             inputs,
             outputs,
-            typeId);
+            typeId,
+            dto.HelpTypeId);
 
         return new GraphNodeData(
             nodeData,
@@ -298,6 +312,8 @@ public sealed class GraphSerializer : IGraphSerializer
         return new NodeDto(
             node.Data.Id,
             node.Data.DefinitionId,
+            node.Data.HelpDefinitionId,
+            node.Data.IsReadOnly,
             node.Data.Name,
             node.Data.Callable,
             node.Data.ExecInit,
@@ -325,6 +341,7 @@ public sealed class GraphSerializer : IGraphSerializer
             variable.Id,
             variable.Name,
             variable.TypeName,
+            variable.IsReadOnly,
             variable.DefaultValue);
     }
 
@@ -334,7 +351,8 @@ public sealed class GraphSerializer : IGraphSerializer
             variable.Id,
             variable.Name,
             variable.TypeName,
-            variable.DefaultValue);
+            variable.DefaultValue,
+            variable.IsReadOnly);
     }
 
     private static GraphEventDto ToDto(GraphEvent graphEvent)

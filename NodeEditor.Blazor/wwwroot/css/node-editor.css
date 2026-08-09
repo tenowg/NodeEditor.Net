@@ -435,7 +435,7 @@
 }
 
 .ne-panel-drag-handle {
-    cursor: move;
+    cursor: move !important;
     user-select: none;
 }
 

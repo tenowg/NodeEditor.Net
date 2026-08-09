@@ -1,3 +1,4 @@
+@using NodeEditor.Blazor.Components.Editors
 @using NodeEditor.Net.ViewModels
 @using NodeEditor.Net.Models
 
@@ -16,7 +17,23 @@
             <span class="ne-node-exec-icon" title="Callable node">▶</span>
         }
         <span class="ne-node-title">@Node.Data.Name</span>
-    </div>
+        
+        @if (@Node.Data.HelpDefinitionId is not null)
+        {
+            <span style="position: relative;">
+                <span type="button" @onmousedown="ShowHelpTip">?</span>
+                @{
+                    var helpType = Type.GetType(Node.Data.HelpDefinitionId);
+                }
+                <div style="@(ShowHelp ? "position: absolute; bottom: 100%; left: 30px; transform: translateY(50%);" : "display: none;")">
+                    
+                    @if (helpType is not null)
+                    {
+                        <DynamicComponent Type="@helpType"></DynamicComponent>
+                    }
+                </div>
+            </span>
+        }
 
     @if (PreviewImage is not null)
     {
@@ -24,6 +41,7 @@
             <img src="@PreviewImage.DataUrl" alt="@Node.Data.Name preview" />
         </div>
     }
+    </div>
 
     <div class="ne-node-body">
         @* Input sockets on the left *@
@@ -81,8 +99,11 @@
 
     private NodeImage? PreviewImage => GetPreviewImage();
 
+    private bool ShowHelp;
+
     private async Task OnNodePointerDown(PointerEventArgs e)
     {
+
         if (e.Button == 0)
         {
             // Ctrl/Shift+click for multi-select, otherwise single select
@@ -105,6 +126,15 @@
                     Position = new Point2D(e.ClientX, e.ClientY)
                 });
             }
+        }
+    }
+
+    private void ShowHelpTip(MouseEventArgs e)
+    {
+        if (e.Button == 0)
+        {
+            ShowHelp = !ShowHelp;
+            //_ = InvokeAsync(StateHasChanged);
         }
     }
 

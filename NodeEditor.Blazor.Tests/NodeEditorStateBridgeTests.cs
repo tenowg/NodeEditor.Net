@@ -147,7 +147,7 @@ public sealed class BridgedNodeEditorStateTests
 
         var bridged = new BridgedNodeEditorState(bridge);
         var node = new NodeViewModel(new NodeData(
-            Id: "n1", Name: "Test", Callable: false, ExecInit: false,
+            Id: "n1", Name: "Test", Callable: false, ExecInit: false, IsReadOnly: false,
             Inputs: [], Outputs: []));
 
         bridged.AddNode(node);
@@ -200,12 +200,12 @@ public sealed class BridgedNodeEditorStateTests
         var stateB = new NodeEditorState();
 
         var nodeA = new NodeViewModel(new NodeData(
-            Id: "a1", Name: "A", Callable: false, ExecInit: false,
+            Id: "a1", Name: "A", Callable: false, ExecInit: false, IsReadOnly: false,
             Inputs: [], Outputs: []));
         stateA.AddNode(nodeA);
 
         var nodeB = new NodeViewModel(new NodeData(
-            Id: "b1", Name: "B", Callable: false, ExecInit: false,
+            Id: "b1", Name: "B", Callable: false, ExecInit: false, IsReadOnly: false,
             Inputs: [], Outputs: []));
         stateB.AddNode(nodeB);
 
@@ -256,7 +256,7 @@ public sealed class BridgedNodeEditorStateTests
         var bridged = new BridgedNodeEditorState(bridge);
         var variable = new GraphVariable("v1", "MyVar", "String", null);
 
-        bridged.AddVariable(variable);
+        bridged.AddVariable(variable, false);
 
         Assert.Single(state.Variables);
         Assert.Equal("MyVar", state.Variables[0].Name);
@@ -269,5 +269,5 @@ public sealed class BridgedNodeEditorStateTests
     }
 
     private static NodeViewModel CreateMinimalNode(string id) =>
-        new(new NodeData(id, id, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
+        new(new NodeData(id, id, false, false, false, Array.Empty<SocketData>(), Array.Empty<SocketData>()));
 }

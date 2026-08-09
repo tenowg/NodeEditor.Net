@@ -43,6 +43,9 @@ public interface INodeEditorState
     HashSet<string> SelectedOverlayIds { get; }
     ConnectionData? SelectedConnection { get; }
 
+    // data
+    object? NodeRegistryKey { get; set; }
+
     // Viewport
     double Zoom { get; set; }
     Rect2D Viewport { get; set; }
@@ -91,7 +94,7 @@ public interface INodeEditorState
     void RequestRedo();
 
     // Variables
-    void AddVariable(GraphVariable variable);
+    void AddVariable(GraphVariable variable, bool failOnDuplicateName = false);
     void RemoveVariable(string variableId);
     void UpdateVariable(GraphVariable updated);
     GraphVariable? FindVariable(string variableId);

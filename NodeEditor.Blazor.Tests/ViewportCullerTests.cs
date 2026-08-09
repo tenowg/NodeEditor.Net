@@ -73,6 +73,7 @@ public sealed class ViewportCullerTests
             "Node",
             false,
             false,
+            false,
             Array.Empty<SocketData>(),
             Array.Empty<SocketData>()));
 

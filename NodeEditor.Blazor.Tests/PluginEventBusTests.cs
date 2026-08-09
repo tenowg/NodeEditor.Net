@@ -24,6 +24,7 @@ public sealed class PluginEventBusTests
             "Test",
             false,
             false,
+            false,
             Array.Empty<SocketData>(),
             Array.Empty<SocketData>()));
 
@@ -47,6 +48,7 @@ public sealed class PluginEventBusTests
         var node = new NodeViewModel(new NodeData(
             "node-2",
             "Test",
+            false,
             false,
             false,
             Array.Empty<SocketData>(),

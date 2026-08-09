@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using NodeEditor.Blazor.Components.Editors;
+using NodeEditor.Net.Attributes;
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Records;
 
 namespace NodeEditor.Blazor.Services.Editors;
 
@@ -13,12 +15,18 @@ public sealed class BoolEditorDefinition : INodeCustomEditor
             return false;
         }
 
+        var test = CustomEditorHint.Bool();
+        if (socket.CustomEditor != test)
+        {
+            return false;
+        }
+
         var hint = socket.EditorHint?.Kind;
         if (hint is not null && hint != SocketEditorKind.Bool)
         {
             return false;
         }
-
+        
         var typeName = socket.TypeName ?? string.Empty;
         return typeName.Equals("bool", StringComparison.OrdinalIgnoreCase)
                || typeName.Equals("boolean", StringComparison.OrdinalIgnoreCase)

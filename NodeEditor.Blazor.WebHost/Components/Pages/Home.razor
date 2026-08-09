@@ -473,6 +473,7 @@
 				Name: "Start",
 				Callable: true,
 				ExecInit: true,
+				IsReadOnly: false,
 				Inputs: Array.Empty<SocketData>(),
 				Outputs: new[] { new SocketData("Exit", execType, false, true) }))
 			{
@@ -674,6 +675,7 @@
 			Name: "Start",
 			Callable: true,
 			ExecInit: true,
+			IsReadOnly: false,
 			Inputs: Array.Empty<SocketData>(),
 			Outputs: new[] { new SocketData("Exit", execType, false, true) }))
 		{
@@ -685,6 +687,7 @@
 			Name: "For Loop Step",
 			Callable: true,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("Enter", execType, true, true),
@@ -707,6 +710,7 @@
 			Name: "Consume",
 			Callable: true,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("Enter", execType, true, true),
@@ -722,6 +726,7 @@
 			Name: "Marker",
 			Callable: true,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[] { new SocketData("Enter", execType, true, true) },
 			Outputs: new[] { new SocketData("Exit", execType, false, true) }))
 		{
@@ -733,6 +738,7 @@
 			Name: "Start",
 			Callable: true,
 			ExecInit: true,
+			IsReadOnly: false,
 			Inputs: Array.Empty<SocketData>(),
 			Outputs: new[] { new SocketData("Exit", execType, false, true) }))
 		{
@@ -744,6 +750,7 @@
 			Name: "List Create",
 			Callable: false,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: Array.Empty<SocketData>(),
 			Outputs: new[] { new SocketData("List", listType, false, false) }))
 		{
@@ -755,6 +762,7 @@
 			Name: "List Add",
 			Callable: false,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("List", listType, true, false),
@@ -770,6 +778,7 @@
 			Name: "List Add",
 			Callable: false,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("List", listType, true, false),
@@ -785,6 +794,7 @@
 			Name: "List Count",
 			Callable: false,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[] { new SocketData("List", listType, true, false) },
 			Outputs: new[] { new SocketData("Count", intType, false, false) }))
 		{
@@ -796,6 +806,7 @@
 			Name: "Consume",
 			Callable: true,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("Enter", execType, true, true),
@@ -811,6 +822,7 @@
 			Name: "String Concat",
 			Callable: false,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("A", stringType, true, false, SocketValue.FromObject("Loop count: ")),
@@ -826,6 +838,7 @@
 			Name: "String Length",
 			Callable: false,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[] { new SocketData("Input", stringType, true, false) },
 			Outputs: new[] { new SocketData("Length", intType, false, false) }))
 		{
@@ -837,6 +850,7 @@
 			Name: "Consume",
 			Callable: true,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("Enter", execType, true, true),
@@ -853,6 +867,7 @@
 			Name: "Start",
 			Callable: true,
 			ExecInit: true,
+			IsReadOnly: false,
 			Inputs: Array.Empty<SocketData>(),
 			Outputs: new[] { new SocketData("Exit", execType, false, true) }))
 		{
@@ -864,6 +879,7 @@
 			Name: "Delay",
 			Callable: true,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("Enter", execType, true, true),
@@ -879,6 +895,7 @@
 			Name: "Start",
 			Callable: true,
 			ExecInit: true,
+			IsReadOnly: false,
 			Inputs: Array.Empty<SocketData>(),
 			Outputs: new[] { new SocketData("Exit", execType, false, true) }))
 		{
@@ -890,6 +907,7 @@
 			Name: "Delay",
 			Callable: true,
 			ExecInit: false,
+			IsReadOnly: false,
 			Inputs: new[]
 			{
 				new SocketData("Enter", execType, true, true),

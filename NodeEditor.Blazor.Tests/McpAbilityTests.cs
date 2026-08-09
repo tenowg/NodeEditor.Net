@@ -136,7 +136,7 @@ public sealed class McpNodeAbilityTests
     {
         var (provider, state) = CreateProvider();
 
-        var nodeData = new NodeData("n1", "TestNode", false, false,
+        var nodeData = new NodeData("n1", "TestNode", false, false, false,
             Array.Empty<SocketData>(), Array.Empty<SocketData>());
         var vm = new NodeViewModel(nodeData) { Position = new Point2D(0, 0) };
         state.AddNode(vm);
@@ -154,9 +154,9 @@ public sealed class McpNodeAbilityTests
     {
         var (provider, state) = CreateProvider();
 
-        var n1 = new NodeData("n1", "Node1", false, false,
+        var n1 = new NodeData("n1", "Node1", false, false, false,
             Array.Empty<SocketData>(), Array.Empty<SocketData>());
-        var n2 = new NodeData("n2", "Node2", false, false,
+        var n2 = new NodeData("n2", "Node2", false, false, false,
             Array.Empty<SocketData>(), Array.Empty<SocketData>());
         state.AddNode(new NodeViewModel(n1));
         state.AddNode(new NodeViewModel(n2));
@@ -174,7 +174,7 @@ public sealed class McpNodeAbilityTests
     {
         var (provider, state) = CreateProvider();
 
-        var nodeData = new NodeData("n1", "TestNode", false, false,
+        var nodeData = new NodeData("n1", "TestNode", false, false, false,
             Array.Empty<SocketData>(), Array.Empty<SocketData>());
         state.AddNode(new NodeViewModel(nodeData));
         Assert.Single(state.Nodes);
@@ -193,7 +193,7 @@ public sealed class McpNodeAbilityTests
 
         var inputs = new[] { new SocketData("Input1", "String", true, false) };
         var outputs = new[] { new SocketData("Output1", "String", false, false) };
-        var nodeData = new NodeData("n1", "TestNode", false, false, inputs, outputs);
+        var nodeData = new NodeData("n1", "TestNode", false, false, false, inputs, outputs);
         state.AddNode(new NodeViewModel(nodeData));
 
         var getParams = JsonDocument.Parse("""{"nodeId":"n1"}""").RootElement;
@@ -208,7 +208,7 @@ public sealed class McpNodeAbilityTests
     {
         var (provider, state) = CreateProvider();
 
-        var nodeData = new NodeData("n1", "TestNode", false, false,
+        var nodeData = new NodeData("n1", "TestNode", false, false, false,
             Array.Empty<SocketData>(), Array.Empty<SocketData>());
         state.AddNode(new NodeViewModel(nodeData));
         state.SelectNode("n1");
@@ -263,8 +263,8 @@ public sealed class McpConnectionAbilityTests
 
         var outputs = new[] { new SocketData("Out", "String", false, false) };
         var inputs = new[] { new SocketData("In", "String", true, false) };
-        state.AddNode(new NodeViewModel(new NodeData("n1", "Node1", false, false, Array.Empty<SocketData>(), outputs)));
-        state.AddNode(new NodeViewModel(new NodeData("n2", "Node2", false, false, inputs, Array.Empty<SocketData>())));
+        state.AddNode(new NodeViewModel(new NodeData("n1", "Node1", false, false, false, Array.Empty<SocketData>(), outputs)));
+        state.AddNode(new NodeViewModel(new NodeData("n2", "Node2", false, false, false, inputs, Array.Empty<SocketData>())));
 
         var addParams = JsonDocument.Parse("""{"outputNodeId":"n1","outputSocketName":"Out","inputNodeId":"n2","inputSocketName":"In"}""").RootElement;
         var addResult = await provider.ExecuteAsync("connection.add", addParams);
@@ -324,7 +324,7 @@ public sealed class McpGraphAbilityTests
         var serializer = CreateSerializer();
         var provider = new GraphAbilityProvider(state, serializer);
 
-        var nodeData = new NodeData("n1", "TestNode", false, false,
+        var nodeData = new NodeData("n1", "TestNode", false, false, false,
             Array.Empty<SocketData>(), Array.Empty<SocketData>());
         state.AddNode(new NodeViewModel(nodeData));
 
@@ -340,7 +340,7 @@ public sealed class McpGraphAbilityTests
         var serializer = CreateSerializer();
         var provider = new GraphAbilityProvider(state, serializer);
 
-        state.AddNode(new NodeViewModel(new NodeData("n1", "N1", false, false,
+        state.AddNode(new NodeViewModel(new NodeData("n1", "N1", false, false, false,
             Array.Empty<SocketData>(), Array.Empty<SocketData>())));
         Assert.Single(state.Nodes);
 

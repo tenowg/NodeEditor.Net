@@ -1,6 +1,7 @@
 <input class="ne-editor-input ne-editor-text"
        value="@CurrentValue"
        @oninput="OnInput"
+       disabled ="@Context.Node.Data.IsReadOnly"
        @onpointerdown:stopPropagation
        @onclick:stopPropagation />
 

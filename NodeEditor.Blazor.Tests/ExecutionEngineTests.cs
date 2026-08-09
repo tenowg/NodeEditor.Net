@@ -766,6 +766,7 @@ public sealed class ExecutionEngineTests
             Name: "Set Variable",
             Callable: true,
             ExecInit: false,
+            IsReadOnly: false,
             Inputs: inputs,
             Outputs: outputs,
             DefinitionId: defId);
@@ -784,6 +785,7 @@ public sealed class ExecutionEngineTests
             Name: "Get Variable",
             Callable: false,
             ExecInit: false,
+            IsReadOnly: false,
             Inputs: Array.Empty<SocketData>(),
             Outputs: outputs,
             DefinitionId: defId);
@@ -840,12 +842,12 @@ public sealed class ExecutionEngineTests
         var listenerMarker = NodeFromDef(registry, "Marker", "listener-marker");
 
         // Build event nodes manually matching EventNodeFactory pattern
-        var triggerNode = new NodeData("trigger", "Trigger Event: TestEvent", Callable: true, ExecInit: false,
+        var triggerNode = new NodeData("trigger", "Trigger Event: TestEvent", Callable: true, ExecInit: false, IsReadOnly: false,
             Inputs: new[] { new SocketData("Enter", execType, IsInput: true, IsExecution: true) },
             Outputs: new[] { new SocketData("Exit", execType, IsInput: false, IsExecution: true) },
             DefinitionId: GraphEvent.TriggerDefinitionPrefix + eventId);
 
-        var listenerNode = new NodeData("listener", "Custom Event: TestEvent", Callable: true, ExecInit: true,
+        var listenerNode = new NodeData("listener", "Custom Event: TestEvent", Callable: true, ExecInit: true, IsReadOnly: false,
             Inputs: Array.Empty<SocketData>(),
             Outputs: new[] { new SocketData("Exit", execType, IsInput: false, IsExecution: true) },
             DefinitionId: GraphEvent.ListenerDefinitionPrefix + eventId);
@@ -885,17 +887,17 @@ public sealed class ExecutionEngineTests
 
         var start = NodeFromDef(registry, "Start", "start");
 
-        var triggerNode = new NodeData("trigger", "Trigger Event: ParallelDelayEvent", Callable: true, ExecInit: false,
+        var triggerNode = new NodeData("trigger", "Trigger Event: ParallelDelayEvent", Callable: true, ExecInit: false, IsReadOnly: false,
             Inputs: new[] { new SocketData("Enter", execType, IsInput: true, IsExecution: true) },
             Outputs: new[] { new SocketData("Exit", execType, IsInput: false, IsExecution: true) },
             DefinitionId: GraphEvent.TriggerDefinitionPrefix + eventId);
 
-        var listenerA = new NodeData("listener-a", "Custom Event: ParallelDelayEvent", Callable: true, ExecInit: true,
+        var listenerA = new NodeData("listener-a", "Custom Event: ParallelDelayEvent", Callable: true, ExecInit: true, IsReadOnly: false,
             Inputs: Array.Empty<SocketData>(),
             Outputs: new[] { new SocketData("Exit", execType, IsInput: false, IsExecution: true) },
             DefinitionId: GraphEvent.ListenerDefinitionPrefix + eventId);
 
-        var listenerB = new NodeData("listener-b", "Custom Event: ParallelDelayEvent", Callable: true, ExecInit: true,
+        var listenerB = new NodeData("listener-b", "Custom Event: ParallelDelayEvent", Callable: true, ExecInit: true, IsReadOnly: false,
             Inputs: Array.Empty<SocketData>(),
             Outputs: new[] { new SocketData("Exit", execType, IsInput: false, IsExecution: true) },
             DefinitionId: GraphEvent.ListenerDefinitionPrefix + eventId);
@@ -945,10 +947,10 @@ public sealed class ExecutionEngineTests
     public void ExecutionPlanner_DetectsExecutionFlowCycle()
     {
         var execType = "NodeEditor.Blazor.Services.Execution.ExecutionPath";
-        var nodeA = new NodeData("a", "A", Callable: true, ExecInit: true,
+        var nodeA = new NodeData("a", "A", Callable: true, ExecInit: true, IsReadOnly: false,
             Inputs: new[] { new SocketData("Enter", execType, IsInput: true, IsExecution: true) },
             Outputs: new[] { new SocketData("Exit", execType, IsInput: false, IsExecution: true) });
-        var nodeB = new NodeData("b", "B", Callable: true, ExecInit: false,
+        var nodeB = new NodeData("b", "B", Callable: true, ExecInit: false, IsReadOnly: false,
             Inputs: new[] { new SocketData("Enter", execType, IsInput: true, IsExecution: true) },
             Outputs: new[] { new SocketData("Exit", execType, IsInput: false, IsExecution: true) });
 

@@ -1,4 +1,5 @@
-﻿using NodeEditor.Net.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NodeEditor.Net.Models;
 using NodeEditor.Net.Services;
 using NodeEditor.Net.Services.Plugins;
 using NodeEditor.Net.Services.Registry;
@@ -100,9 +101,14 @@ public sealed class NodeExecutionService : INodeExecutionService
                 : details);
         }
 
+        // Decide on the registry to use
+        var registry = options.NodeRegistryKey is not null
+            ? _services.GetRequiredKeyedService<INodeRegistryService>(options.NodeRegistryKey)
+            : _registry;
+
         // 1. Build runtime
         var runtime = new ExecutionRuntime(nodes, connections, context,
-            _services, _registry, Gate, options, token, ResolveServicesForDefinition);
+            _services, registry, Gate, options, token, ResolveServicesForDefinition);
 
         // Forward runtime events to service events
         runtime.NodeStarted += (s, e) => NodeStarted?.Invoke(this, e);

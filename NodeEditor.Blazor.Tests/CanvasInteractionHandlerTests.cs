@@ -40,7 +40,7 @@ public sealed class CanvasInteractionHandlerTests
     private static NodeViewModel CreateNode(string id, Point2D? position = null)
     {
         var node = new NodeViewModel(new NodeData(
-            id, "Node", false, false,
+            id, "Node", false, false, false,
             new[] { new SocketData("In", "System.String", true, false) },
             new[] { new SocketData("Out", "System.String", false, false) }));
         node.Position = position ?? Point2D.Zero;

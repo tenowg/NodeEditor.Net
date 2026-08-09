@@ -50,11 +50,13 @@ public sealed class ConnectionPathRenderTests : BunitContext
             "A",
             false,
             false,
+            false,
             Array.Empty<SocketData>(),
             new[] { outputSocket }));
         var nodeB = new NodeViewModel(new NodeData(
             "n2",
             "B",
+            false,
             false,
             false,
             new[] { inputSocket },
