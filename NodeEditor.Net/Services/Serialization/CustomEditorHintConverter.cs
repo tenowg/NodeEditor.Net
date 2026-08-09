@@ -1,7 +1,4 @@
 ﻿using NodeEditor.Net.Records;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;    
 
@@ -26,7 +23,7 @@ namespace NodeEditor.Net.Services.Serialization
             }
             catch (Exception)
             {
-                return CustomEditorHint.Error;
+                return new CustomEditorHint("Error");
             }
         }
 

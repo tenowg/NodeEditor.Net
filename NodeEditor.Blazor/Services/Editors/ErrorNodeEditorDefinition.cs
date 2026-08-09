@@ -12,7 +12,7 @@ namespace NodeEditor.Blazor.Services.Editors
     {
         public bool CanEdit(SocketData socket)
         {
-            return socket.CustomEditor == CustomEditorHint.Error;
+            return socket.CustomEditor == CustomEditorHint.Error();
         }
 
         public RenderFragment Render(SocketEditorContext context)

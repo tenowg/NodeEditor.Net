@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using NodeEditor.Net.Attributes;
+using System.Text.Json.Serialization;
 
 namespace NodeEditor.Net.Records
 {
@@ -12,12 +13,25 @@ namespace NodeEditor.Net.Records
         public TMeta Metadata { get; set; } = Metadata;
     }
 
-
-    public static class DefaultCustomEditors
+    [NodeEditorHint("Error", typeof(ErrorOptions))]
+    public record ErrorOptions
     {
-        extension(CustomEditorHint hint)
+        public string Message { get; set; } = "Error";
+
+        // 1. Explicitly override the strongly-typed virtual Equals
+        public virtual bool Equals(ErrorOptions? other)
         {
-            public static CustomEditorHint Error => new CustomEditorHint("Error");
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            // Custom rule: Users are equal if they share the same ID
+            return true;
+        }
+
+        // 2. Always override GetHashCode when overriding Equals
+        public override int GetHashCode()
+        {
+            return this.GetHashCode();
         }
     }
 }
