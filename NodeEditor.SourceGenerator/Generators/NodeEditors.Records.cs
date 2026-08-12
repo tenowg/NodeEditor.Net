@@ -19,9 +19,11 @@ namespace NodeEditor.SourceGenerator.Generators
 
             foreach (var model in models)
             {
+                if (model == null) continue;
                 if (string.IsNullOrWhiteSpace(model.OptionsTypeName)) continue;
 
                 var sb = $@"
+#nullable enable
 namespace {model!.ContainingNamespace};
 public sealed class CustomEditorHint{model.HintTypeName}OptionsConverter
     : global::System.Text.Json.Serialization.JsonConverter<global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}>>
@@ -62,9 +64,10 @@ public sealed class CustomEditorHint{model.HintTypeName}OptionsConverter
                 context.AddSource($"{rootNamespace.RootNamespace.Replace(".", "_")}_{model.HintTypeName}NodeEditors.g.cs", sb);
             }
 
-            if (models.Any(x => !string.IsNullOrWhiteSpace(x.HintTypeName)))
+            if (models.Where(x => x is not null).Any(x => !string.IsNullOrWhiteSpace(x!.HintTypeName)))
             {
                 var initializer = new IndentedStringBuilder();
+                initializer.AppendLine("#nullable enable");
                 initializer.AppendLine($"public static class {rootNamespace.RootNamespace.Replace(".", "")}CustomEditorHintGeneratedRegistration");
                 using (initializer.Block())
                 {
@@ -88,6 +91,7 @@ public sealed class CustomEditorHint{model.HintTypeName}OptionsConverter
                     {
                         foreach (var model in models)
                         {
+                            if (model == null) continue; 
                             initializer.AppendLine($"public static global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}> {model.HintTypeName}({model.OptionsTypeName}? defaultValue = null) => new global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}>(\"Bool\", defaultValue ?? new {model.OptionsTypeName}());");
                         }
                     }

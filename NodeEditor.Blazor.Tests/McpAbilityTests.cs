@@ -386,7 +386,7 @@ public sealed class McpGraphAbilityTests
         var typeResolver = new SocketTypeResolver();
         var validator = new ConnectionValidator(typeResolver);
         var migrator = new NodeEditor.Net.Services.Serialization.GraphSchemaMigrator();
-        return new NodeEditor.Net.Services.Serialization.GraphSerializer(registry, validator, migrator);
+        return new NodeEditor.Net.Services.Serialization.GraphSerializer(registry, validator, migrator, new JsonSerializerOptions());
     }
 
     private static JsonElement EmptyParams() => JsonDocument.Parse("{}").RootElement;

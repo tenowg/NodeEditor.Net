@@ -61,6 +61,12 @@ public interface INodeExecutionContext
 
     ExecutionEventBus EventBus { get; }
 
+    /// <summary>
+    /// Typed bag shared by every node in this execution. Seeded by the host on
+    /// <see cref="INodeRuntimeStorage.Shared"/>; nodes may add or replace items without wiring sockets.
+    /// </summary>
+    IGraphSharedContext Shared { get; }
+
     // ── Advanced ──
 
     INodeRuntimeStorage RuntimeStorage { get; }

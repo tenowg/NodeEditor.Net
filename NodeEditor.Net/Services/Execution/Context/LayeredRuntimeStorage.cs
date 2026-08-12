@@ -18,7 +18,7 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
     private readonly ConcurrentDictionary<string, object?> _localSocketValues = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, bool> _localExecutedNodes = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, object?> _localVariables = new(StringComparer.Ordinal);
-    private readonly HashSet<string> _localVariableKeys = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, byte> _localVariableKeys = new(StringComparer.Ordinal);
 
     public LayeredRuntimeStorage(INodeRuntimeStorage parent)
     {
@@ -78,7 +78,7 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
 
     public object? GetVariable(string key)
     {
-        if (_localVariableKeys.Contains(key))
+        if (_localVariableKeys.ContainsKey(key))
         {
             _localVariables.TryGetValue(key, out var value);
             return value;
@@ -90,7 +90,7 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
     public void SetVariable(string key, object? value)
     {
         _localVariables[key] = value;
-        _localVariableKeys.Add(key);
+        _localVariableKeys[key] = 0;
     }
 
     // ── Generation: delegate to parent ──
@@ -101,9 +101,11 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
 
     public void PopGeneration() => _parent.PopGeneration();
 
-    // ── EventBus: shared from parent ──
+    // ── EventBus / Shared: same instance as parent ──
 
     public ExecutionEventBus EventBus => _parent.EventBus;
+
+    public IGraphSharedContext Shared => _parent.Shared;
 
     // ── Child creation ──
 

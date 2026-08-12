@@ -210,7 +210,7 @@ public sealed class GraphSerializer : IGraphSerializer
 
             return dto;
         }
-        catch (Exception ex)
+        catch
         {
             throw;
         }

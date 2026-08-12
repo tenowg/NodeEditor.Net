@@ -1137,5 +1137,115 @@ public sealed class ParallelInitiatorTests
         // If parallel, total time should be ~300ms, not ~600ms
         Assert.True(sw.ElapsedMilliseconds < 550, $"Expected parallel execution but took {sw.ElapsedMilliseconds}ms");
     }
+
+    // ── Shared context ──
+
+    private sealed record RunState(string Name);
+
+    [Fact]
+    public async Task SharedContext_HostSeed_VisibleToNodesWithoutSockets()
+    {
+        var service = CreateService(out var registry);
+        RegisterSharedContextTestNodes(registry);
+
+        var start = NodeFromDef(registry, "Start", "start");
+        var reader = NodeFromDef(registry, "Read Shared", "reader");
+        var checker = NodeFromDef(registry, "Check Shared", "checker");
+
+        var nodes = new List<NodeData> { start, reader, checker };
+        var connections = new List<ConnectionData>
+        {
+            TestConnections.Exec("start", "Exit", "reader", "Enter"),
+            TestConnections.Exec("reader", "Exit", "checker", "Enter")
+        };
+
+        var context = new NodeRuntimeStorage();
+        context.Shared.Set(new RunState("seeded"));
+
+        await service.ExecuteAsync(nodes, connections, context, null!, NodeExecutionOptions.Default, CancellationToken.None);
+
+        Assert.Equal("seeded", context.GetSocketValue("reader", "Name"));
+        Assert.Equal("updated", context.GetSocketValue("checker", "Name"));
+        Assert.Equal("updated", context.Shared.Get<RunState>().Name);
+    }
+
+    [Fact]
+    public async Task SharedContext_Rerun_ReusesBagAndSkipsExecutedDataNode()
+    {
+        var service = CreateService(out var registry);
+        RegisterSharedContextTestNodes(registry);
+
+        var seed = NodeFromDef(registry, "Seed Shared Once", "seed");
+        var start = NodeFromDef(registry, "Start", "start");
+        var consume = NodeFromDef(registry, "Consume", "consume");
+        var reader = NodeFromDef(registry, "Read Shared", "reader");
+
+        var nodes = new List<NodeData> { seed, start, consume, reader };
+        var connections = new List<ConnectionData>
+        {
+            TestConnections.Exec("start", "Exit", "consume", "Enter"),
+            TestConnections.Exec("consume", "Exit", "reader", "Enter"),
+            TestConnections.Data("seed", "Count", "consume", "Value")
+        };
+
+        var context = new NodeRuntimeStorage();
+        context.Shared.Set("seedCount", 0);
+        context.Shared.Set(new RunState("turn1"));
+
+        await service.ExecuteAsync(nodes, connections, context, null!, NodeExecutionOptions.Default, CancellationToken.None);
+
+        Assert.True(context.IsNodeExecuted("seed"));
+        Assert.Equal(1, context.Shared.Get<int>("seedCount"));
+        Assert.Equal("turn1", context.GetSocketValue("reader", "Name"));
+        Assert.Equal("updated", context.Shared.Get<RunState>().Name);
+
+        context.Shared.Set(new RunState("turn2"));
+        await service.ExecuteAsync(nodes, connections, context, null!, NodeExecutionOptions.Default, CancellationToken.None);
+
+        Assert.Equal(1, context.Shared.Get<int>("seedCount"));
+        Assert.Equal("turn2", context.GetSocketValue("reader", "Name"));
+        Assert.Equal("updated", context.Shared.Get<RunState>().Name);
+    }
+
+    private static void RegisterSharedContextTestNodes(NodeRegistryService registry)
+    {
+        var readShared = NodeBuilder.Create("Read Shared")
+            .Category("Test")
+            .Callable()
+            .Output<string>("Name")
+            .OnExecute(async (ctx, _) =>
+            {
+                var state = ctx.Shared.Get<RunState>();
+                ctx.SetOutput("Name", state.Name);
+                ctx.Shared.Set(state with { Name = "updated" });
+                await ctx.TriggerAsync("Exit");
+            })
+            .Build();
+
+        var checkShared = NodeBuilder.Create("Check Shared")
+            .Category("Test")
+            .Callable()
+            .Output<string>("Name")
+            .OnExecute(async (ctx, _) =>
+            {
+                ctx.SetOutput("Name", ctx.Shared.Get<RunState>().Name);
+                await ctx.TriggerAsync("Exit");
+            })
+            .Build();
+
+        var seedOnce = NodeBuilder.Create("Seed Shared Once")
+            .Category("Test")
+            .Output<int>("Count")
+            .OnExecute((ctx, _) =>
+            {
+                var count = ctx.Shared.TryGet<int>("seedCount", out var current) ? current + 1 : 1;
+                ctx.Shared.Set("seedCount", count);
+                ctx.SetOutput("Count", count);
+                return Task.CompletedTask;
+            })
+            .Build();
+
+        registry.RegisterDefinitions([readShared, checkShared, seedOnce]);
+    }
 }
 

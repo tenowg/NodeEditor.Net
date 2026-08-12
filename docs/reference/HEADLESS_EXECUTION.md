@@ -110,6 +110,28 @@ MCP Client → execute_ability("execution.run_json", { json: "..." })
 
 Graph variables are supported in headless execution. The `VariableNodeExecutor` seeds variables from their default values before execution begins, and Get/Set nodes read and write the shared execution context.
 
+## Shared context
+
+Every `INodeRuntimeStorage` exposes a typed object bag on `Shared` (`IGraphSharedContext`). The host seeds it before execution; every node sees the same instance through `INodeExecutionContext.Shared` with no extra sockets.
+
+```csharp
+var storage = new NodeRuntimeStorage();
+storage.Shared.Set(mySession);
+storage.Shared.Set("userId", currentUserId);
+
+await runner.ExecuteAsync(graphData, storage);
+
+// Any node:
+var session = context.Shared.Get<MySession>();
+context.Shared.Set(updatedSession);
+```
+
+This is separate from graph variables and from `IServiceProvider`. Writes replace. Named keys never collide with type-keyed slots.
+
+`Shared` is the **same instance** on group children (`CreateChild`) and parallel layered scopes. It is **not** serialized — it holds live runtime objects.
+
+Reuse the same `INodeRuntimeStorage` for later turns to keep both this bag and the executed-node cache. Non-callable nodes already executed are skipped; callable nodes run again and can read the mutated bag. The visual editor still creates a fresh storage on each Run click.
+
 ## Service Registration
 
 `HeadlessGraphRunner` is registered as a **scoped** service by `AddNodeEditor()`. In non-Blazor hosts, create a scope for each execution:

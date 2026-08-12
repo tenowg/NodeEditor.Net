@@ -26,4 +26,11 @@ public interface INodeRuntimeStorage
     INodeRuntimeStorage CreateChild(string scopeName, bool inheritVariables = true);
 
     ExecutionEventBus EventBus { get; }
+
+    /// <summary>
+    /// Host-seeded bag of typed objects visible to every node for the lifetime of this storage.
+    /// Shared across group children and parallel layered scopes. Reusing this storage
+    /// on a later <c>ExecuteAsync</c> keeps both the executed-node cache and this bag.
+    /// </summary>
+    IGraphSharedContext Shared { get; }
 }

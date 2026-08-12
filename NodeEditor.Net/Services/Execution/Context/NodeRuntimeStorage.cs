@@ -12,24 +12,35 @@ public sealed class NodeRuntimeStorage : INodeRuntimeStorage
 
     public ExecutionEventBus EventBus { get; }
 
+    public IGraphSharedContext Shared { get; }
+
     public NodeRuntimeStorage()
+        : this(new GraphSharedContext())
     {
+    }
+
+    public NodeRuntimeStorage(IGraphSharedContext shared)
+    {
+        ArgumentNullException.ThrowIfNull(shared);
         _socketValues = new ConcurrentDictionary<string, object?>(StringComparer.Ordinal);
         _executedNodes = new ConcurrentDictionary<string, bool>(StringComparer.Ordinal);
         _variables = new ConcurrentDictionary<string, object?>(StringComparer.Ordinal);
         EventBus = new ExecutionEventBus();
+        Shared = shared;
     }
 
     private NodeRuntimeStorage(
         ConcurrentDictionary<string, object?> socketValues,
         ConcurrentDictionary<string, bool> executedNodes,
         ConcurrentDictionary<string, object?> variables,
-        ExecutionEventBus eventBus)
+        ExecutionEventBus eventBus,
+        IGraphSharedContext shared)
     {
         _socketValues = socketValues;
         _executedNodes = executedNodes;
         _variables = variables;
         EventBus = eventBus;
+        Shared = shared;
     }
 
     public bool TryGetSocketValue(string nodeId, string socketName, out object? value)
@@ -104,7 +115,7 @@ public sealed class NodeRuntimeStorage : INodeRuntimeStorage
             ? new ConcurrentDictionary<string, object?>(_variables, StringComparer.Ordinal)
             : new ConcurrentDictionary<string, object?>(StringComparer.Ordinal);
 
-        return new NodeRuntimeStorage(socketValues, executedNodes, variables, EventBus);
+        return new NodeRuntimeStorage(socketValues, executedNodes, variables, EventBus, Shared);
     }
 
     private static string BuildSocketKey(string nodeId, string socketName)
