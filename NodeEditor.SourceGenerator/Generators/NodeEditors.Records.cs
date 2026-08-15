@@ -92,7 +92,7 @@ public sealed class CustomEditorHint{model.HintTypeName}OptionsConverter
                         foreach (var model in models)
                         {
                             if (model == null) continue; 
-                            initializer.AppendLine($"public static global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}> {model.HintTypeName}({model.OptionsTypeName}? defaultValue = null) => new global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}>(\"Bool\", defaultValue ?? new {model.OptionsTypeName}());");
+                            initializer.AppendLine($"public static global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}> {model.HintTypeName}({model.OptionsTypeName}? defaultValue = null) => new global::NodeEditor.Net.Records.CustomEditorHint<{model.OptionsTypeName}>(\"{model.HintTypeName}\", defaultValue ?? new {model.OptionsTypeName}());");
                         }
                     }
                 }

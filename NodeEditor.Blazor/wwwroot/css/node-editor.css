@@ -194,8 +194,11 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     min-width: 200px;
-    max-width: 320px;
-    cursor: move;
+/*    max-width: 320px;*/
+/*    min-width: min-content;
+    min-height: min-content;
+    resize: both;
+    overflow: auto;*/
     transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
@@ -252,6 +255,7 @@
     font-size: 12px;
     font-weight: 600;
     color: #e0e0f0;
+    cursor: move;
 }
 
 .ne-node-exec-icon {
@@ -264,6 +268,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.ne-node-help {
+    position: relative;
+    cursor: help;
 }
 
 /* ============================================
@@ -700,7 +709,7 @@
    Socket Editors
    ============================================ */
 .ne-socket-editor {
-    margin-left: 18px;
+    margin-left: 8px;
     margin-top: 4px;
     margin-bottom: 6px;
     max-width: calc(100% - 18px);

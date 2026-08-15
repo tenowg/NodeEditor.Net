@@ -17,7 +17,7 @@ public sealed class BoolEditorDefinition : INodeCustomEditor
 
         //var test = CustomEditorHint.Bool();
         var customEditorHint = socket.CustomEditor?.EditorHint;
-        if (customEditorHint is not null && customEditorHint == CustomEditorHint.Bool().EditorHint)
+        if (customEditorHint is not null && customEditorHint != CustomEditorHint.Bool().EditorHint)
         {
             return false;
         }
