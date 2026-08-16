@@ -370,7 +370,7 @@ public sealed class SerializableListVariableTests
         // Verify Get definition was created
         var getDef = registry.Definitions.FirstOrDefault(d => d.Id == variable.GetDefinitionId);
         Assert.NotNull(getDef);
-        Assert.Equal("Get MyList", getDef!.Name);
+        Assert.Equal("Get Variable (MyList)", getDef!.Name);
         Assert.Equal("Variables", getDef.Category);
         Assert.Empty(getDef.Inputs);
         Assert.Single(getDef.Outputs);
@@ -379,7 +379,7 @@ public sealed class SerializableListVariableTests
         // Verify Set definition was created
         var setDef = registry.Definitions.FirstOrDefault(d => d.Id == variable.SetDefinitionId);
         Assert.NotNull(setDef);
-        Assert.Equal("Set MyList", setDef!.Name);
+        Assert.Equal("Set Variable (MyList)", setDef!.Name);
         Assert.Equal("Variables", setDef.Category);
         // Set node: Enter (exec), Value (data input)
         Assert.Equal(2, setDef.Inputs.Count);
@@ -603,6 +603,6 @@ public sealed class SerializableListVariableTests
         var validator = new ConnectionValidator(resolver);
         var migrator = new NodeEditor.Net.Services.Serialization.GraphSchemaMigrator();
 
-        return new NodeEditor.Net.Services.Serialization.GraphSerializer(registry, validator, migrator);
+        return new NodeEditor.Net.Services.Serialization.GraphSerializer(registry, validator, migrator, new JsonSerializerOptions());
     }
 }

@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using NodeEditor.Net.Models;
 using NodeEditor.Net.Services;
 using NodeEditor.Net.Services.Execution;
@@ -237,7 +238,7 @@ public sealed class GraphSerializerTests
         var resolver = new SocketTypeResolver();
         var validator = new ConnectionValidator(resolver);
         var migrator = new GraphSchemaMigrator();
-        var serializer = new GraphSerializer(registry, validator, migrator);
+        var serializer = new GraphSerializer(registry, validator, migrator, new JsonSerializerOptions());
 
         // Create a DTO with an old-format DefinitionId
         var oldDefId = "NodeEditor.Net.Services.Execution.StandardNodeContext.Start(NodeEditor.Net.Services.Execution.ExecutionPath)";
@@ -299,6 +300,6 @@ public sealed class GraphSerializerTests
         var validator = new ConnectionValidator(resolver);
         var migrator = new GraphSchemaMigrator();
 
-        return new GraphSerializer(registry, validator, migrator);
+        return new GraphSerializer(registry, validator, migrator, new JsonSerializerOptions());
     }
 }

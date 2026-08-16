@@ -20,6 +20,7 @@ internal sealed class ScopedNodeExecutionContext : INodeExecutionContext
     public IServiceProvider Services => _runtime.GetServicesForNode(Node.Id);
     public CancellationToken CancellationToken => _runtime.CancellationToken;
     public ExecutionEventBus EventBus => _scope.EventBus;
+    public IGraphSharedContext Shared => _scope.Shared;
     public INodeRuntimeStorage RuntimeStorage => _scope;
 
     internal ScopedNodeExecutionContext(NodeData node, ExecutionRuntime runtime, INodeRuntimeStorage scope)

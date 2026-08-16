@@ -583,6 +583,7 @@ public sealed class LLMTornadoPluginTests
         public IServiceProvider Services { get; }
         public CancellationToken CancellationToken { get; }
         public ExecutionEventBus EventBus => _storage.EventBus;
+        public IGraphSharedContext Shared => _storage.Shared;
         public INodeRuntimeStorage RuntimeStorage => _storage;
 
         public Dictionary<string, object?> Outputs { get; } = new(StringComparer.Ordinal);

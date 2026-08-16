@@ -14,6 +14,7 @@ internal sealed class NodeExecutionContextImpl : INodeExecutionContext
     public IServiceProvider Services => _runtime.GetServicesForNode(Node.Id);
     public CancellationToken CancellationToken => _runtime.CancellationToken;
     public ExecutionEventBus EventBus => _runtime.RuntimeStorage.EventBus;
+    public IGraphSharedContext Shared => _runtime.RuntimeStorage.Shared;
     public INodeRuntimeStorage RuntimeStorage => _runtime.RuntimeStorage;
 
     internal NodeExecutionContextImpl(NodeData node, ExecutionRuntime runtime)

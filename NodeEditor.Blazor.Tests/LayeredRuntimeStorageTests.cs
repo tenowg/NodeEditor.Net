@@ -157,6 +157,57 @@ public sealed class LayeredRuntimeStorageTests
     }
 
     [Fact]
+    public void SharedContext_SameInstanceAsParent()
+    {
+        var parent = new NodeRuntimeStorage();
+        var layer = new LayeredRuntimeStorage(parent);
+
+        Assert.Same(parent.Shared, layer.Shared);
+    }
+
+    [Fact]
+    public void SharedContext_WriteFromLayer_VisibleOnParent()
+    {
+        var parent = new NodeRuntimeStorage();
+        parent.Shared.Set("seed", "from-host");
+
+        var layer = new LayeredRuntimeStorage(parent);
+        layer.Shared.Set("seed", "from-layer");
+        layer.Shared.Set(42);
+
+        Assert.Equal("from-layer", parent.Shared.Get<string>("seed"));
+        Assert.Equal(42, parent.Shared.Get<int>());
+    }
+
+    [Fact]
+    public void SharedContext_CreateChild_SameInstance()
+    {
+        var parent = new NodeRuntimeStorage();
+        var child = parent.CreateChild("group");
+        var nested = child.CreateChild("inner");
+
+        Assert.Same(parent.Shared, child.Shared);
+        Assert.Same(parent.Shared, nested.Shared);
+
+        nested.Shared.Set("k", "v");
+        Assert.Equal("v", parent.Shared.Get<string>("k"));
+    }
+
+    [Fact]
+    public void SharedContext_InjectedBag_IsPreservedOnChild()
+    {
+        var bag = new GraphSharedContext();
+        bag.Set("session", "abc");
+
+        var parent = new NodeRuntimeStorage(bag);
+        var child = parent.CreateChild("group");
+
+        Assert.Same(bag, parent.Shared);
+        Assert.Same(bag, child.Shared);
+        Assert.Equal("abc", child.Shared.Get<string>("session"));
+    }
+
+    [Fact]
     public void NestedChildren_ReadThrough()
     {
         var parent = new NodeRuntimeStorage();
@@ -184,6 +235,31 @@ public sealed class LayeredRuntimeStorageTests
         Assert.Equal("root", parent.GetSocketValue("node1", "out"));
         Assert.Equal("layer1", layer1.GetSocketValue("node1", "out"));
         Assert.Equal("layer2", layer2.GetSocketValue("node1", "out"));
+    }
+
+    [Fact]
+    public void DumpMethods_ReturnLocalEntriesOnly()
+    {
+        var parent = new NodeRuntimeStorage();
+        parent.MarkNodeExecuted("parent-node");
+        parent.SetSocketValue("parent-node", "out", "root");
+        parent.SetVariable("parent-var", 1);
+
+        var layer = new LayeredRuntimeStorage(parent);
+        layer.MarkNodeExecuted("child-node");
+        layer.SetSocketValue("child-node", "out", "local");
+        layer.SetVariable("child-var", 2);
+
+        Assert.Equal(new[] { "child-node" }, layer.GetExecutedNodeIds());
+        Assert.DoesNotContain("parent-node", layer.GetExecutedNodeIds());
+
+        var sockets = layer.GetSocketEntries();
+        Assert.Single(sockets);
+        Assert.Equal(("child-node", "out", "local"), sockets[0]);
+
+        var variables = layer.GetVariableEntries();
+        Assert.Single(variables);
+        Assert.Equal(("child-var", 2), variables[0]);
     }
 
     [Fact]

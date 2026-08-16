@@ -1,6 +1,7 @@
 using System.Text.Json;
 using NodeEditor.Net.Models;
 using NodeEditor.Net.Services;
+using NodeEditor.Net.Services.Execution;
 using NodeEditor.Net.Services.Infrastructure;
 using NodeEditor.Net.Services.Plugins;
 using NodeEditor.Net.Services.Registry;
@@ -210,10 +211,153 @@ public sealed class GraphSerializer : IGraphSerializer
 
             return dto;
         }
-        catch (Exception ex)
+        catch
         {
             throw;
         }
+    }
+
+    public RuntimeStorageSnapshot ExportRuntimeStorage(INodeRuntimeStorage storage, ICollection<string>? warnings = null)
+    {
+        if (storage is null)
+        {
+            throw new ArgumentNullException(nameof(storage));
+        }
+
+        var executed = storage.GetExecutedNodeIds().ToList();
+        var sockets = new List<RuntimeSocketEntry>();
+        var variables = new List<RuntimeVariableEntry>();
+
+        foreach (var (nodeId, socketName, value) in storage.GetSocketEntries())
+        {
+            if (!TryCreateSocketValue(value, out var socketValue, out var error))
+            {
+                warnings?.Add($"Skipped socket '{nodeId}::{socketName}': {error}");
+                continue;
+            }
+
+            sockets.Add(new RuntimeSocketEntry(nodeId, socketName, socketValue));
+        }
+
+        foreach (var (key, value) in storage.GetVariableEntries())
+        {
+            if (!TryCreateSocketValue(value, out var socketValue, out var error))
+            {
+                warnings?.Add($"Skipped variable '{key}': {error}");
+                continue;
+            }
+
+            variables.Add(new RuntimeVariableEntry(key, socketValue));
+        }
+
+        return new RuntimeStorageSnapshot(executed, sockets, variables);
+    }
+
+    public void ImportRuntimeStorage(
+        INodeRuntimeStorage storage,
+        RuntimeStorageSnapshot snapshot,
+        ISocketTypeResolver? typeResolver = null)
+    {
+        if (storage is null)
+        {
+            throw new ArgumentNullException(nameof(storage));
+        }
+
+        if (snapshot is null)
+        {
+            throw new ArgumentNullException(nameof(snapshot));
+        }
+
+        foreach (var nodeId in snapshot.ExecutedNodeIds ?? new List<string>())
+        {
+            if (!string.IsNullOrWhiteSpace(nodeId))
+            {
+                storage.MarkNodeExecuted(nodeId);
+            }
+        }
+
+        foreach (var entry in snapshot.Sockets ?? new List<RuntimeSocketEntry>())
+        {
+            storage.SetSocketValue(entry.NodeId, entry.SocketName, ToObject(entry.Value, typeResolver));
+        }
+
+        foreach (var entry in snapshot.Variables ?? new List<RuntimeVariableEntry>())
+        {
+            storage.SetVariable(entry.Key, ToObject(entry.Value, typeResolver));
+        }
+    }
+
+    public string SerializeRuntimeStorage(RuntimeStorageSnapshot snapshot)
+    {
+        if (snapshot is null)
+        {
+            throw new ArgumentNullException(nameof(snapshot));
+        }
+
+        return JsonSerializer.Serialize(snapshot, _jsonSerializerOptions);
+    }
+
+    public RuntimeStorageSnapshot DeserializeRuntimeStorage(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            throw new ArgumentException("JSON payload is required.", nameof(json));
+        }
+
+        var snapshot = JsonSerializer.Deserialize<RuntimeStorageSnapshot>(json, _jsonSerializerOptions);
+        if (snapshot is null)
+        {
+            throw new JsonException("Unable to deserialize runtime storage JSON.");
+        }
+
+        return snapshot with
+        {
+            ExecutedNodeIds = snapshot.ExecutedNodeIds ?? new List<string>(),
+            Sockets = snapshot.Sockets ?? new List<RuntimeSocketEntry>(),
+            Variables = snapshot.Variables ?? new List<RuntimeVariableEntry>()
+        };
+    }
+
+    private static bool TryCreateSocketValue(object? value, out SocketValue? socketValue, out string? error)
+    {
+        try
+        {
+            socketValue = SocketValue.FromObject(value);
+            error = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            socketValue = null;
+            error = ex.Message;
+            return false;
+        }
+    }
+
+    private static object? ToObject(SocketValue? socketValue, ISocketTypeResolver? typeResolver)
+    {
+        if (socketValue?.Json is null)
+        {
+            return null;
+        }
+
+        Type? targetType = null;
+        if (!string.IsNullOrWhiteSpace(socketValue.TypeName))
+        {
+            if (typeResolver is not null)
+            {
+                targetType = typeResolver.Resolve(socketValue.TypeName);
+            }
+
+            targetType ??= Type.GetType(socketValue.TypeName, throwOnError: false);
+        }
+
+        if (targetType is not null)
+        {
+            return socketValue.Json.Value.Deserialize(targetType);
+        }
+
+        return socketValue.Json.Value.Deserialize<object>();
     }
 
     private GraphNodeData CreateGraphNodeData(NodeDto dto, List<string> warnings)

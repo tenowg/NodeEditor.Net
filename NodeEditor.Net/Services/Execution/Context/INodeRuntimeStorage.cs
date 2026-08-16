@@ -18,6 +18,15 @@ public interface INodeRuntimeStorage
     object? GetVariable(string key);
     void SetVariable(string key, object? value);
 
+    /// <summary>Node IDs marked executed in this storage layer (local only).</summary>
+    IReadOnlyCollection<string> GetExecutedNodeIds();
+
+    /// <summary>Socket values stored in this storage layer (local only).</summary>
+    IReadOnlyList<(string NodeId, string SocketName, object? Value)> GetSocketEntries();
+
+    /// <summary>Variables stored in this storage layer (local only).</summary>
+    IReadOnlyList<(string Key, object? Value)> GetVariableEntries();
+
     int CurrentGeneration { get; }
     void PushGeneration();
     void PopGeneration();
@@ -26,4 +35,11 @@ public interface INodeRuntimeStorage
     INodeRuntimeStorage CreateChild(string scopeName, bool inheritVariables = true);
 
     ExecutionEventBus EventBus { get; }
+
+    /// <summary>
+    /// Host-seeded bag of typed objects visible to every node for the lifetime of this storage.
+    /// Shared across group children and parallel layered scopes. Reusing this storage
+    /// on a later <c>ExecuteAsync</c> keeps both the executed-node cache and this bag.
+    /// </summary>
+    IGraphSharedContext Shared { get; }
 }

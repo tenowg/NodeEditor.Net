@@ -11,7 +11,10 @@
     @oncontextmenu:stopPropagation
      @key="Node.Data.Id">
     
-    <div class="ne-node-header">
+    <div class="ne-node-header" 
+        @onpointerdown="OnHeaderPointerDown"
+        @onpointerdown:stopPropagation>
+        
         @if (Node.Data.Callable)
         {
             <span class="ne-node-exec-icon" title="Callable node">▶</span>
@@ -20,7 +23,7 @@
         
         @if (@Node.Data.HelpDefinitionId is not null)
         {
-            <span style="position: relative;">
+            <span class="ne-node-help">
                 <span type="button" @onmousedown="ShowHelpTip">?</span>
                 @{
                     var helpType = Type.GetType(Node.Data.HelpDefinitionId);
@@ -94,12 +97,27 @@
     public EventCallback<NodePointerEventArgs> OnNodeContextMenu { get; set; }
 
     private string NodeStyle =>
-        $"left: {Node.Position.X}px; top: {Node.Position.Y}px; " +
-        $"width: {Node.Size.Width}px; min-height: {Node.Size.Height}px;";
+        $"left: {Node.Position.X}px; top: {Node.Position.Y}px; ";// +
+        //$"width: {Node.Size.Width}px; min-height: {Node.Size.Height}px;";
 
     private NodeImage? PreviewImage => GetPreviewImage();
 
     private bool ShowHelp;
+
+    private async Task OnHeaderPointerDown(PointerEventArgs e)
+    {
+        if (e.Button == 0)
+        {
+            if (OnNodeDragStart.HasDelegate)
+            {
+                await OnNodeDragStart.InvokeAsync(new NodePointerEventArgs
+                {
+                    NodeId = Node.Data.Id,
+                    Position = new Point2D(e.ClientX, e.ClientY)
+                });
+            }
+        }
+    }
 
     private async Task OnNodePointerDown(PointerEventArgs e)
     {
@@ -118,14 +136,14 @@
                 OnSelectNode();
             }
 
-            if (OnNodeDragStart.HasDelegate)
-            {
-                await OnNodeDragStart.InvokeAsync(new NodePointerEventArgs
-                {
-                    NodeId = Node.Data.Id,
-                    Position = new Point2D(e.ClientX, e.ClientY)
-                });
-            }
+            // if (OnNodeDragStart.HasDelegate)
+            // {
+            //     await OnNodeDragStart.InvokeAsync(new NodePointerEventArgs
+            //     {
+            //         NodeId = Node.Data.Id,
+            //         Position = new Point2D(e.ClientX, e.ClientY)
+            //     });
+            // }
         }
     }
 

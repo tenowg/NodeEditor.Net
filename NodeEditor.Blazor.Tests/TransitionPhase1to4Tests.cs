@@ -103,6 +103,7 @@ public sealed class TransitionPhase1to4Tests
         Assert.NotNull(type.GetProperty("Services"));
         Assert.NotNull(type.GetProperty("CancellationToken"));
         Assert.NotNull(type.GetProperty("EventBus"));
+        Assert.NotNull(type.GetProperty("Shared"));
         Assert.NotNull(type.GetProperty("RuntimeStorage"));
 
         // Data I/O — use name-only search since overloads cause AmbiguousMatchException
@@ -141,12 +142,16 @@ public sealed class TransitionPhase1to4Tests
         Assert.NotNull(type.GetMethod("ClearNodeExecuted"));
         Assert.NotNull(type.GetMethod("GetVariable"));
         Assert.NotNull(type.GetMethod("SetVariable"));
+        Assert.NotNull(type.GetMethod("GetExecutedNodeIds"));
+        Assert.NotNull(type.GetMethod("GetSocketEntries"));
+        Assert.NotNull(type.GetMethod("GetVariableEntries"));
         Assert.NotNull(type.GetProperty("CurrentGeneration"));
         Assert.NotNull(type.GetMethod("PushGeneration"));
         Assert.NotNull(type.GetMethod("PopGeneration"));
         Assert.NotNull(type.GetMethod("ClearExecutedForNodes"));
         Assert.NotNull(type.GetMethod("CreateChild"));
         Assert.NotNull(type.GetProperty("EventBus"));
+        Assert.NotNull(type.GetProperty("Shared"));
     }
 
     [Fact]
@@ -163,7 +168,7 @@ public sealed class TransitionPhase1to4Tests
     [Fact]
     public void Phase2A_NodeBuilder_Create_ProducesValidDefinition()
     {
-        var builder = NodeBuilder.Create("TestNode");
+        INodeBuilder builder = NodeBuilder.Create("TestNode");
         builder.Category("TestCategory");
         builder.Description("A test node");
         builder.Input<int>("A");
@@ -251,7 +256,7 @@ public sealed class TransitionPhase1to4Tests
     [Fact]
     public void Phase2A_NodeBuilder_Build_ProducesWorkingFactory()
     {
-        var builder = NodeBuilder.Create("FactoryTest");
+        INodeBuilder builder = NodeBuilder.Create("FactoryTest");
         builder.Input<int>("X");
         builder.Output<int>("Y");
         var definition = builder.Build();
@@ -273,7 +278,7 @@ public sealed class TransitionPhase1to4Tests
     [Fact]
     public void Phase2A_NodeBuilder_DuplicateSocketsAreIgnored()
     {
-        var builder = NodeBuilder.Create("DedupTest");
+        INodeBuilder builder = NodeBuilder.Create("DedupTest");
         builder.Callable();
         builder.Callable(); // duplicate
         builder.Input<int>("A");
@@ -535,7 +540,7 @@ public sealed class TransitionPhase1to4Tests
     [Fact]
     public void Integration_InlineNode_BuildsAndRegisters()
     {
-        var inlineBuilder = NodeBuilder.Create("InlineAdd");
+        INodeBuilder inlineBuilder = NodeBuilder.Create("InlineAdd");
         inlineBuilder.Category("Math");
         inlineBuilder.Description("Adds two numbers");
         inlineBuilder.Input<int>("A");

@@ -18,7 +18,7 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
     private readonly ConcurrentDictionary<string, object?> _localSocketValues = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, bool> _localExecutedNodes = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, object?> _localVariables = new(StringComparer.Ordinal);
-    private readonly HashSet<string> _localVariableKeys = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, byte> _localVariableKeys = new(StringComparer.Ordinal);
 
     public LayeredRuntimeStorage(INodeRuntimeStorage parent)
     {
@@ -78,7 +78,7 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
 
     public object? GetVariable(string key)
     {
-        if (_localVariableKeys.Contains(key))
+        if (_localVariableKeys.ContainsKey(key))
         {
             _localVariables.TryGetValue(key, out var value);
             return value;
@@ -90,7 +90,38 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
     public void SetVariable(string key, object? value)
     {
         _localVariables[key] = value;
-        _localVariableKeys.Add(key);
+        _localVariableKeys[key] = 0;
+    }
+
+    public IReadOnlyCollection<string> GetExecutedNodeIds()
+    {
+        return _localExecutedNodes.Keys.ToArray();
+    }
+
+    public IReadOnlyList<(string NodeId, string SocketName, object? Value)> GetSocketEntries()
+    {
+        var entries = new List<(string, string, object?)>(_localSocketValues.Count);
+        foreach (var kvp in _localSocketValues)
+        {
+            if (!TrySplitSocketKey(kvp.Key, out var nodeId, out var socketName))
+                continue;
+
+            entries.Add((nodeId, socketName, kvp.Value));
+        }
+
+        return entries;
+    }
+
+    public IReadOnlyList<(string Key, object? Value)> GetVariableEntries()
+    {
+        var entries = new List<(string, object?)>(_localVariableKeys.Count);
+        foreach (var key in _localVariableKeys.Keys)
+        {
+            _localVariables.TryGetValue(key, out var value);
+            entries.Add((key, value));
+        }
+
+        return entries;
     }
 
     // ── Generation: delegate to parent ──
@@ -101,9 +132,11 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
 
     public void PopGeneration() => _parent.PopGeneration();
 
-    // ── EventBus: shared from parent ──
+    // ── EventBus / Shared: same instance as parent ──
 
     public ExecutionEventBus EventBus => _parent.EventBus;
+
+    public IGraphSharedContext Shared => _parent.Shared;
 
     // ── Child creation ──
 
@@ -116,5 +149,20 @@ public sealed class LayeredRuntimeStorage : INodeRuntimeStorage
     private static string BuildSocketKey(string nodeId, string socketName)
     {
         return string.Concat(nodeId, "::", socketName);
+    }
+
+    private static bool TrySplitSocketKey(string key, out string nodeId, out string socketName)
+    {
+        var separator = key.IndexOf("::", StringComparison.Ordinal);
+        if (separator <= 0 || separator + 2 >= key.Length)
+        {
+            nodeId = string.Empty;
+            socketName = string.Empty;
+            return false;
+        }
+
+        nodeId = key[..separator];
+        socketName = key[(separator + 2)..];
+        return true;
     }
 }
