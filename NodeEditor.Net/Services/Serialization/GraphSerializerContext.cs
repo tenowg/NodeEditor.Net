@@ -21,6 +21,9 @@ namespace NodeEditor.Net.Services.Serialization;
 [JsonSerializable(typeof(GraphEventDto))]
 [JsonSerializable(typeof(OverlayDto))]
 [JsonSerializable(typeof(CustomEditorHint))]
+[JsonSerializable(typeof(RuntimeStorageSnapshot))]
+[JsonSerializable(typeof(RuntimeSocketEntry))]
+[JsonSerializable(typeof(RuntimeVariableEntry))]
 public partial class GraphSerializerContext : JsonSerializerContext
 {
 }

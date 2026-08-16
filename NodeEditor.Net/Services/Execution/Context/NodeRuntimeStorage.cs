@@ -85,6 +85,34 @@ public sealed class NodeRuntimeStorage : INodeRuntimeStorage
         _variables[key] = value;
     }
 
+    public IReadOnlyCollection<string> GetExecutedNodeIds()
+    {
+        return _executedNodes.Keys.ToArray();
+    }
+
+    public IReadOnlyList<(string NodeId, string SocketName, object? Value)> GetSocketEntries()
+    {
+        var entries = new List<(string, string, object?)>(_socketValues.Count);
+        foreach (var kvp in _socketValues)
+        {
+            if (!TrySplitSocketKey(kvp.Key, out var nodeId, out var socketName))
+                continue;
+
+            entries.Add((nodeId, socketName, kvp.Value));
+        }
+
+        return entries;
+    }
+
+    public IReadOnlyList<(string Key, object? Value)> GetVariableEntries()
+    {
+        var entries = new List<(string, object?)>(_variables.Count);
+        foreach (var kvp in _variables)
+            entries.Add((kvp.Key, kvp.Value));
+
+        return entries;
+    }
+
     // ── Iteration generation (for loop body scoping) ──
 
     public int CurrentGeneration => _currentGeneration;
@@ -121,5 +149,20 @@ public sealed class NodeRuntimeStorage : INodeRuntimeStorage
     private static string BuildSocketKey(string nodeId, string socketName)
     {
         return string.Concat(nodeId, "::", socketName);
+    }
+
+    private static bool TrySplitSocketKey(string key, out string nodeId, out string socketName)
+    {
+        var separator = key.IndexOf("::", StringComparison.Ordinal);
+        if (separator <= 0 || separator + 2 >= key.Length)
+        {
+            nodeId = string.Empty;
+            socketName = string.Empty;
+            return false;
+        }
+
+        nodeId = key[..separator];
+        socketName = key[(separator + 2)..];
+        return true;
     }
 }

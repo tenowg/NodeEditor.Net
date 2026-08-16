@@ -238,6 +238,31 @@ public sealed class LayeredRuntimeStorageTests
     }
 
     [Fact]
+    public void DumpMethods_ReturnLocalEntriesOnly()
+    {
+        var parent = new NodeRuntimeStorage();
+        parent.MarkNodeExecuted("parent-node");
+        parent.SetSocketValue("parent-node", "out", "root");
+        parent.SetVariable("parent-var", 1);
+
+        var layer = new LayeredRuntimeStorage(parent);
+        layer.MarkNodeExecuted("child-node");
+        layer.SetSocketValue("child-node", "out", "local");
+        layer.SetVariable("child-var", 2);
+
+        Assert.Equal(new[] { "child-node" }, layer.GetExecutedNodeIds());
+        Assert.DoesNotContain("parent-node", layer.GetExecutedNodeIds());
+
+        var sockets = layer.GetSocketEntries();
+        Assert.Single(sockets);
+        Assert.Equal(("child-node", "out", "local"), sockets[0]);
+
+        var variables = layer.GetVariableEntries();
+        Assert.Single(variables);
+        Assert.Equal(("child-var", 2), variables[0]);
+    }
+
+    [Fact]
     public void ConcurrentWritesDoNotCorrupt()
     {
         var parent = new NodeRuntimeStorage();

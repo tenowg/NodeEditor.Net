@@ -132,6 +132,29 @@ This is separate from graph variables and from `IServiceProvider`. Writes replac
 
 Reuse the same `INodeRuntimeStorage` for later turns to keep both this bag and the executed-node cache. Non-callable nodes already executed are skipped; callable nodes run again and can read the mutated bag. The visual editor still creates a fresh storage on each Run click.
 
+## Persisting the executed-node cache
+
+In-process reuse is enough when the storage instance stays alive. To resume after a process or login restart, export a **companion snapshot** of the executed-node cache (plus socket values and runtime variables) and store it **alongside** the graph JSON. Default graph export does **not** include this snapshot — editor saves stay reusable templates.
+
+The snapshot does **not** include `Shared`, the event bus, or loop generation state. Re-seed live objects on resume.
+
+```csharp
+// turn N ends
+var snapshot = serializer.ExportRuntimeStorage(storage);
+var snapshotJson = serializer.SerializeRuntimeStorage(snapshot);
+// save graph JSON + snapshot JSON in the host database
+
+// later session
+var storage = new NodeRuntimeStorage();
+storage.Shared.Set(mySession);          // live objects
+var snapshot = serializer.DeserializeRuntimeStorage(snapshotJson);
+serializer.ImportRuntimeStorage(storage, snapshot, typeResolver);
+await runner.ExecuteAsync(graphData, storage);
+// non-callable nodes already in the snapshot are skipped
+```
+
+Unserializable socket or variable values (delegates, live service objects) are omitted from the snapshot. Those belong in `Shared`. Pass an optional `warnings` collection to `ExportRuntimeStorage` to see what was skipped.
+
 ## Service Registration
 
 `HeadlessGraphRunner` is registered as a **scoped** service by `AddNodeEditor()`. In non-Blazor hosts, create a scope for each execution:
@@ -150,3 +173,5 @@ await runner.ExecuteFromJsonAsync(json, token);
 | `NodeExecutionOptions` | `NodeEditor.Net.Services.Execution` |
 | `ExecutionMode` | `NodeEditor.Net.Services.Execution` |
 | `NodeExecutionContext` | `NodeEditor.Net.Services.Execution` |
+| `RuntimeStorageSnapshot` | `NodeEditor.Net.Models` |
+| `IGraphSerializer` | `NodeEditor.Net.Services.Serialization` |

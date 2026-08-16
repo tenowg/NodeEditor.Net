@@ -18,6 +18,15 @@ public interface INodeRuntimeStorage
     object? GetVariable(string key);
     void SetVariable(string key, object? value);
 
+    /// <summary>Node IDs marked executed in this storage layer (local only).</summary>
+    IReadOnlyCollection<string> GetExecutedNodeIds();
+
+    /// <summary>Socket values stored in this storage layer (local only).</summary>
+    IReadOnlyList<(string NodeId, string SocketName, object? Value)> GetSocketEntries();
+
+    /// <summary>Variables stored in this storage layer (local only).</summary>
+    IReadOnlyList<(string Key, object? Value)> GetVariableEntries();
+
     int CurrentGeneration { get; }
     void PushGeneration();
     void PopGeneration();

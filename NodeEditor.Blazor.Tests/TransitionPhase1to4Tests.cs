@@ -142,6 +142,9 @@ public sealed class TransitionPhase1to4Tests
         Assert.NotNull(type.GetMethod("ClearNodeExecuted"));
         Assert.NotNull(type.GetMethod("GetVariable"));
         Assert.NotNull(type.GetMethod("SetVariable"));
+        Assert.NotNull(type.GetMethod("GetExecutedNodeIds"));
+        Assert.NotNull(type.GetMethod("GetSocketEntries"));
+        Assert.NotNull(type.GetMethod("GetVariableEntries"));
         Assert.NotNull(type.GetProperty("CurrentGeneration"));
         Assert.NotNull(type.GetMethod("PushGeneration"));
         Assert.NotNull(type.GetMethod("PopGeneration"));

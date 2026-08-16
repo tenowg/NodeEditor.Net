@@ -1,5 +1,6 @@
 using NodeEditor.Net.Models;
 using NodeEditor.Net.Services;
+using NodeEditor.Net.Services.Execution;
 
 namespace NodeEditor.Net.Services.Serialization;
 
@@ -16,4 +17,10 @@ public interface IGraphSerializer
 
     string Serialize(GraphDto dto);
     GraphDto Deserialize(string json);
+
+    RuntimeStorageSnapshot ExportRuntimeStorage(INodeRuntimeStorage storage, ICollection<string>? warnings = null);
+    void ImportRuntimeStorage(INodeRuntimeStorage storage, RuntimeStorageSnapshot snapshot, ISocketTypeResolver? typeResolver = null);
+
+    string SerializeRuntimeStorage(RuntimeStorageSnapshot snapshot);
+    RuntimeStorageSnapshot DeserializeRuntimeStorage(string json);
 }
