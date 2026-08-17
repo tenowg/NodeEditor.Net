@@ -13,6 +13,8 @@ public sealed class HeadlessGraphRunner
     private readonly IGraphSerializer _serializer;
     private readonly ISocketTypeResolver? _typeResolver;
 
+    public INodeExecutionService ExecutionService { get => _executionService; }
+
     public HeadlessGraphRunner(
         INodeExecutionService executionService,
         IGraphSerializer serializer,
