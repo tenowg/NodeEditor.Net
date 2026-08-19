@@ -90,12 +90,12 @@
         get
         {
             var classes = new List<string>();
-            
+
             if (Socket.Data.IsInput)
                 classes.Add("ne-socket--input");
             else
                 classes.Add("ne-socket--output");
-                
+
             if (Socket.Data.IsExecution)
                 classes.Add("ne-socket--execution");
             else
@@ -103,7 +103,7 @@
 
             if (IsConnected)
                 classes.Add("ne-socket--connected");
-                
+
             return string.Join(" ", classes);
         }
     }
@@ -113,7 +113,8 @@
         get
         {
             var color = GetSocketColor();
-            return $"background-color: rgb({color.R}, {color.G}, {color.B});";
+            var hidden = Socket.Data.Hidden && !IsConnected ? "width: 0; height: 0; margin: 0; padding: 0; overflow: hidden; pointer-events: none;" : "";
+            return $"background-color: rgb({color.R}, {color.G}, {color.B}); {hidden}";
         }
     }
 

@@ -829,6 +829,7 @@ public sealed class CanvasInteractionHandler : ICanvasInteractionHandler
             socket.Value,
             socket.EditorHint,
             socket.CustomEditor,
+            socket.Hidden,
             socket.DynamicGroup,
             socket.DynamicIndex,
             socket.DynamicItemTypeName);

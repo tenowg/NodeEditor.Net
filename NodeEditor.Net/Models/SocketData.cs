@@ -10,6 +10,7 @@ public sealed record class SocketData(
     SocketValue? Value = null,
     SocketEditorHint? EditorHint = null,
     CustomEditorHint? CustomEditor = null,
+    bool Hidden = false,
     string? DynamicGroup = null,
     int? DynamicIndex = null,
     string? DynamicItemTypeName = null

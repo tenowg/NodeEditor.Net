@@ -79,23 +79,23 @@ public sealed class NodeBuilder : INodeBuilder
     }
 
     // ── Data sockets ──
-    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null)
+    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null, bool hidden = false)
     {
         var socketValue = defaultValue is not null ? SocketValue.FromObject(defaultValue) : null;
-        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint));
+        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint, null, hidden));
         return this;
     }
 
-    public INodeBuilder Input(string name, string typeName, SocketValue? defaultValue = null, SocketEditorHint? editorHint = null)
+    public INodeBuilder Input(string name, string typeName, SocketValue? defaultValue = null, SocketEditorHint? editorHint = null, bool hidden = false)
     {
-        AddSocketIfMissing(_inputs, new SocketData(name, typeName, true, false, defaultValue, editorHint));
+        AddSocketIfMissing(_inputs, new SocketData(name, typeName, true, false, defaultValue, editorHint, null, hidden));
         return this;
     }
 
-    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint ? editorHint = null, CustomEditorHint? customEditorHint = null)
+    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint ? editorHint = null, CustomEditorHint? customEditorHint = null, bool hidden = false)
     {
         var socketValue = defaultValue is not null ? SocketValue.FromObject(defaultValue) : null;
-        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint, customEditorHint));
+        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint, customEditorHint, hidden));
         return this;
     }
 
