@@ -24,6 +24,11 @@ public sealed class SocketViewModel : ViewModelBase
         Data = Data with { Value = SocketValue.FromObject(value) };
     }
 
+    internal void ReplaceData(SocketData data)
+    {
+        Data = data;
+    }
+
     public Point2D Position
     {
         get => _position;

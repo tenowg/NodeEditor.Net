@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Services;
 
 namespace NodeEditor.Net.Services.Execution;
 
@@ -38,6 +39,9 @@ internal sealed class ScopedNodeExecutionContext : INodeExecutionContext
         // in the scoped storage or read-through from the parent.
         if (_scope.TryGetSocketValue(Node.Id, socketName, out var cached))
             return Cast<T>(cached);
+
+        if (DynamicSocketGroup.TryAssemble<T>(Node, socketName, _scope, out var assembled))
+            return assembled;
 
         // Fallback: read the socket default value directly. We intentionally avoid
         // the previous sync-over-async ResolveInputScopedAsync(...).GetAwaiter().GetResult()

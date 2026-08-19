@@ -63,6 +63,8 @@ public interface INodeEditorState
     void RemoveConnectionsToNode(string nodeId);
     void RemoveConnectionsToInput(string nodeId, string socketName);
     void RemoveConnectionsFromOutput(string nodeId, string socketName);
+    void SyncDynamicInputSockets(string nodeId);
+    void SetSocketValue(string nodeId, string socketName, object? value);
 
     // Connection operations
     void AddConnection(ConnectionData connection);

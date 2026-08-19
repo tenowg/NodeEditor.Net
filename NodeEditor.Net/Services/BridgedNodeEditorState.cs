@@ -224,6 +224,8 @@ public sealed class BridgedNodeEditorState : INodeEditorState
     public void RemoveConnectionsToNode(string nodeId) => Dispatch(() => State.RemoveConnectionsToNode(nodeId));
     public void RemoveConnectionsToInput(string nodeId, string socketName) => Dispatch(() => State.RemoveConnectionsToInput(nodeId, socketName));
     public void RemoveConnectionsFromOutput(string nodeId, string socketName) => Dispatch(() => State.RemoveConnectionsFromOutput(nodeId, socketName));
+    public void SyncDynamicInputSockets(string nodeId) => Dispatch(() => State.SyncDynamicInputSockets(nodeId));
+    public void SetSocketValue(string nodeId, string socketName, object? value) => Dispatch(() => State.SetSocketValue(nodeId, socketName, value));
 
     // ── Connection operations ───────────────────────────────────────────
     public void AddConnection(ConnectionData connection) => Dispatch(() => State.AddConnection(connection));

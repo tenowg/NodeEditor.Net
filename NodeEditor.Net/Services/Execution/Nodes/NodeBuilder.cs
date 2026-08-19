@@ -1,5 +1,6 @@
 using NodeEditor.Net.Models;
 using NodeEditor.Net.Records;
+using NodeEditor.Net.Services;
 using NodeEditor.Net.Services.Registry;
 using System;
 using System.Collections.Generic;
@@ -78,23 +79,30 @@ public sealed class NodeBuilder : INodeBuilder
     }
 
     // ── Data sockets ──
-    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null)
+    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null, bool hidden = false)
     {
         var socketValue = defaultValue is not null ? SocketValue.FromObject(defaultValue) : null;
-        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint));
+        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint, null, hidden));
         return this;
     }
 
-    public INodeBuilder Input(string name, string typeName, SocketValue? defaultValue = null, SocketEditorHint? editorHint = null)
+    public INodeBuilder Input(string name, string typeName, SocketValue? defaultValue = null, SocketEditorHint? editorHint = null, bool hidden = false)
     {
-        AddSocketIfMissing(_inputs, new SocketData(name, typeName, true, false, defaultValue, editorHint));
+        AddSocketIfMissing(_inputs, new SocketData(name, typeName, true, false, defaultValue, editorHint, null, hidden));
         return this;
     }
 
-    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint ? editorHint = null, CustomEditorHint? customEditorHint = null)
+    public INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint ? editorHint = null, CustomEditorHint? customEditorHint = null, bool hidden = false)
     {
         var socketValue = defaultValue is not null ? SocketValue.FromObject(defaultValue) : null;
-        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint, customEditorHint));
+        AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint, customEditorHint, hidden));
+        return this;
+    }
+
+    public INodeBuilder DynamicListInput<TItem>(string name, SocketEditorHint? editorHint = null)
+    {
+        var itemTypeName = typeof(TItem).FullName ?? typeof(TItem).Name;
+        AddSocketIfMissing(_inputs, DynamicSocketGroup.CreateItemSocket(name, 0, itemTypeName, editorHint));
         return this;
     }
 

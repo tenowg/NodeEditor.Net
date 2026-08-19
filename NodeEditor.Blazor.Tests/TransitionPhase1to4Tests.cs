@@ -317,6 +317,22 @@ public sealed class TransitionPhase1to4Tests
         Assert.Contains(definition.Outputs, s => s.Name == "Bar" && s.TypeName == "System.Int32");
     }
 
+    [Fact]
+    public void Phase2A_NodeBuilder_DynamicListInput_SeedsEmptyItemSocket()
+    {
+        var builder = NodeBuilder.Create("MakeList");
+        builder.DynamicListInput<string>("Items");
+        builder.Output<SerializableList>("Result");
+        var definition = builder.Build();
+
+        var item = Assert.Single(definition.Inputs);
+        Assert.Equal("Items[0]", item.Name);
+        Assert.Equal("Items", item.DynamicGroup);
+        Assert.Equal(0, item.DynamicIndex);
+        Assert.Equal(typeof(string).FullName, item.TypeName);
+        Assert.Contains(definition.Outputs, s => s.Name == "Result");
+    }
+
     // ═══════════════════════════════════════════════════════════════
     // Phase 3A — NodeDefinition Extension
     // ═══════════════════════════════════════════════════════════════

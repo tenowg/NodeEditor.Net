@@ -13,6 +13,7 @@ public partial class NodeComponent
     private bool _lastCallable;
     private int _lastConnectionSignature;
     private int _lastPreviewSignature;
+    private int _lastInputsVersion;
     private bool _showHelp;
 
     protected override bool ShouldRender()
@@ -33,6 +34,7 @@ public partial class NodeComponent
                            Node.Data.Callable != _lastCallable ||
                    connectionSignature != _lastConnectionSignature ||
                    previewSignature != _lastPreviewSignature ||
+                   Node.InputsVersion != _lastInputsVersion ||
                    ShowHelp != _showHelp;
 
         if (shouldRender)
@@ -46,6 +48,7 @@ public partial class NodeComponent
             _lastCallable = Node.Data.Callable;
             _lastConnectionSignature = connectionSignature;
             _lastPreviewSignature = previewSignature;
+            _lastInputsVersion = Node.InputsVersion;
             _showHelp = ShowHelp;
         }
 

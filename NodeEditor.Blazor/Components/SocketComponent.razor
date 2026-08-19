@@ -44,6 +44,9 @@
     [Parameter]
     public EventCallback<SocketPointerEventArgs> OnPointerUp { get; set; }
 
+    [CascadingParameter]
+    private INodeEditorState? EditorState { get; set; }
+
     private bool ShowEditor =>
         Socket.Data.IsInput &&
         !Socket.Data.IsExecution &&
@@ -66,7 +69,14 @@
                 Node = Node,
                 SetValue = value =>
                 {
-                    Socket.SetValue(value);
+                    if (EditorState is not null)
+                    {
+                        EditorState.SetSocketValue(NodeId, Socket.Data.Name, value);
+                    }
+                    else
+                    {
+                        Socket.SetValue(value);
+                    }
                     StateHasChanged();
                 }
             };
@@ -80,12 +90,12 @@
         get
         {
             var classes = new List<string>();
-            
+
             if (Socket.Data.IsInput)
                 classes.Add("ne-socket--input");
             else
                 classes.Add("ne-socket--output");
-                
+
             if (Socket.Data.IsExecution)
                 classes.Add("ne-socket--execution");
             else
@@ -93,7 +103,7 @@
 
             if (IsConnected)
                 classes.Add("ne-socket--connected");
-                
+
             return string.Join(" ", classes);
         }
     }
@@ -103,7 +113,8 @@
         get
         {
             var color = GetSocketColor();
-            return $"background-color: rgb({color.R}, {color.G}, {color.B});";
+            var hidden = Socket.Data.Hidden && !IsConnected ? "width: 0; height: 0; margin: 0; padding: 0; overflow: hidden; pointer-events: none;" : "";
+            return $"background-color: rgb({color.R}, {color.G}, {color.B}); {hidden}";
         }
     }
 
