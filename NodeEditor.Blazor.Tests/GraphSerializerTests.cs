@@ -270,6 +270,83 @@ public sealed class GraphSerializerTests
         Assert.Equal("Start", importedNode.Data.Name);
     }
 
+    [Fact]
+    public void Import_OldListCreate_SeedsDynamicItemSocket()
+    {
+        var registry = new NodeRegistryService(new NodeDiscoveryService());
+        registry.EnsureInitialized();
+        var listCreate = registry.Definitions.First(d => d.Name == "List Create" && d.InlineExecutor is not null);
+
+        var resolver = new SocketTypeResolver();
+        var serializer = new GraphSerializer(registry, new ConnectionValidator(resolver), new GraphSchemaMigrator(), new JsonSerializerOptions());
+
+        var dto = new GraphDto(
+            GraphSerializer.CurrentVersion,
+            new List<NodeDto>
+            {
+                new(
+                    "create",
+                    listCreate.Id,
+                    null,
+                    false,
+                    "List Create",
+                    false,
+                    false,
+                    0, 0, 180, 60,
+                    new List<SocketData>(),
+                    new List<SocketData> { new("Result", typeof(SerializableList).FullName!, false, false) })
+            },
+            new List<ConnectionDto>(),
+            new ViewportDto(0, 0, 0, 0, 1),
+            new List<string>());
+
+        var state = new NodeEditorState();
+        serializer.Import(state, dto);
+
+        var node = Assert.Single(state.Nodes);
+        Assert.Contains(node.Inputs, socket => socket.Data.Name == "Items[0]" && socket.Data.DynamicGroup == "Items");
+        Assert.Contains(node.Outputs, socket => socket.Data.Name == "Result");
+    }
+
+    [Fact]
+    public void ExportImport_PreservesDynamicItemSocketsAndConnections()
+    {
+        var state = new NodeEditorState();
+        var itemType = typeof(object).FullName!;
+        var create = new NodeViewModel(new NodeData(
+            "create",
+            "List Create",
+            false,
+            false,
+            false,
+            new[] { DynamicSocketGroup.CreateItemSocket("Items", 0, itemType) },
+            new[] { new SocketData("Result", typeof(SerializableList).FullName!, false, false) },
+            "List Create"));
+        var source = new NodeViewModel(new NodeData(
+            "source",
+            "Const",
+            false,
+            false,
+            false,
+            Array.Empty<SocketData>(),
+            new[] { new SocketData("Out", typeof(string).FullName!, false, false) }));
+
+        state.AddNode(source);
+        state.AddNode(create);
+        state.AddConnection(new ConnectionData("source", "create", "Out", "Items[0]", false));
+
+        var serializer = CreateSerializer();
+        var dto = serializer.Export(state);
+        var imported = new NodeEditorState();
+        serializer.Import(imported, dto);
+
+        var importedCreate = imported.Nodes.Single(n => n.Data.Id == "create");
+        Assert.Equal(2, importedCreate.Inputs.Count);
+        Assert.Equal("Items[0]", importedCreate.Inputs[0].Data.Name);
+        Assert.Equal("Items[1]", importedCreate.Inputs[1].Data.Name);
+        Assert.Contains(imported.Connections, c => c.InputNodeId == "create" && c.InputSocketName == "Items[0]");
+    }
+
     private static GraphSerializer CreateSerializer()
     {
         var registry = new NodeRegistryService(new NodeDiscoveryService());

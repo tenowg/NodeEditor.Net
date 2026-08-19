@@ -827,7 +827,11 @@ public sealed class CanvasInteractionHandler : ICanvasInteractionHandler
             socket.IsInput,
             socket.IsExecution,
             socket.Value,
-            socket.EditorHint);
+            socket.EditorHint,
+            socket.CustomEditor,
+            socket.DynamicGroup,
+            socket.DynamicIndex,
+            socket.DynamicItemTypeName);
 
     private bool IsValidConnection(ConnectionData connection, SocketViewModel targetSocket)
     {

@@ -250,6 +250,8 @@ internal sealed class ExecutionRuntime
                 RuntimeStorage.SetSocketValue(node.Id, input.Name, defaultValue);
             }
         }
+
+        DynamicSocketGroup.CacheAssembledLists(node, RuntimeStorage);
     }
 
     /// <summary>
@@ -379,6 +381,8 @@ internal sealed class ExecutionRuntime
                 scope.SetSocketValue(node.Id, input.Name, defaultValue);
             }
         }
+
+        DynamicSocketGroup.CacheAssembledLists(node, scope);
     }
 
     internal async Task<object?> ResolveInputScopedAsync(NodeData node, string socketName, INodeRuntimeStorage scope)

@@ -33,6 +33,7 @@ public interface INodeBuilder
     INodeBuilder Input<T>(string name, T? defaultValue = default, SocketEditorHint? editorHint = null, CustomEditorHint? customEditorHint = null);
 
     INodeBuilder Input(string name, string typeName, SocketValue? defaultValue = null, SocketEditorHint? editorHint = null);
+    INodeBuilder DynamicListInput<TItem>(string name, SocketEditorHint? editorHint = null);
     INodeBuilder Output<T>(string name);
     INodeBuilder Output(string name, string typeName);
 

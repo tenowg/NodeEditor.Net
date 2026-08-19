@@ -380,6 +380,16 @@ public sealed class GraphSerializer : IGraphSerializer
         var inputs = dto.Inputs ?? new List<SocketData>();
         var outputs = dto.Outputs ?? new List<SocketData>();
 
+        if (!string.IsNullOrWhiteSpace(typeId))
+        {
+            var definition = _registry.Definitions.FirstOrDefault(d =>
+                d.Id.Equals(typeId, StringComparison.Ordinal));
+            if (definition is not null)
+            {
+                inputs = DynamicSocketGroup.SeedMissingGroups(inputs, definition.Inputs).ToList();
+            }
+        }
+
         var nodeData = new NodeData(
             dto.Id,
             dto.Name,

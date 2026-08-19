@@ -1,4 +1,5 @@
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Services;
 using NodeEditor.Net.Services.Execution;
 using NodeEditor.Net.Services.Registry;
 
@@ -15,6 +16,19 @@ public sealed class NodeSuiteTests
 
     private static NodeExecutionService CreateService(NodeRegistryService registry)
         => new(new ExecutionPlanner(), registry, new MinimalServiceProvider());
+
+    private static NodeData WithListItems(NodeData node, params object[] items)
+    {
+        var itemType = typeof(object).FullName!;
+        var others = node.Inputs.Where(socket => !DynamicSocketGroup.IsDynamic(socket)).ToList();
+        var sockets = items
+            .Select((item, index) => DynamicSocketGroup.CreateItemSocket("Items", index, itemType) with
+            {
+                Value = SocketValue.FromObject(item)
+            })
+            .Append(DynamicSocketGroup.CreateItemSocket("Items", items.Length, itemType));
+        return node with { Inputs = others.Concat(sockets).ToList() };
+    }
 
     private static NodeData FromDef(NodeRegistryService reg, string name, string id, params (string socket, object value)[] overrides)
     {
@@ -384,6 +398,26 @@ public sealed class NodeSuiteTests
             });
 
         Assert.Equal(0, ctx.GetSocketValue("count", "Result"));
+    }
+
+    [Fact]
+    public async Task ListCreate_AssemblesItemSockets()
+    {
+        var reg = CreateRegistry();
+        var start = FromDef(reg, "Start", "start");
+        var create = WithListItems(FromDef(reg, "List Create", "create"), "A", "B");
+        var count = FromDef(reg, "List Count", "count");
+        var consume = FromDef(reg, "Consume", "consume");
+
+        var ctx = await ExecuteDataPipeline(reg, new() { start, create, count, consume },
+            new()
+            {
+                TestConnections.Exec("start", "Exit", "consume", "Enter"),
+                TestConnections.Data("create", "Result", "count", "List"),
+                TestConnections.Data("count", "Result", "consume", "Value")
+            });
+
+        Assert.Equal(2, ctx.GetSocketValue("count", "Result"));
     }
 
     [Fact]

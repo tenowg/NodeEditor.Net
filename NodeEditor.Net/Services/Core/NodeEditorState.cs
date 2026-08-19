@@ -260,41 +260,54 @@ public class NodeEditorState : INodeEditorState
 
         Clear();
 
-        foreach (var variable in graphData.Variables)
+        _suppressDynamicSync = true;
+        try
         {
-            AddVariable(variable);
-        }
-
-        if (graphData.Events is not null)
-        {
-            foreach (var graphEvent in graphData.Events)
+            foreach (var variable in graphData.Variables)
             {
-                AddEvent(graphEvent);
+                AddVariable(variable);
+            }
+
+            if (graphData.Events is not null)
+            {
+                foreach (var graphEvent in graphData.Events)
+                {
+                    AddEvent(graphEvent);
+                }
+            }
+
+            foreach (var graphNode in graphData.Nodes)
+            {
+                var vm = new NodeViewModel(graphNode.Data)
+                {
+                    Position = graphNode.Position,
+                    Size = graphNode.Size,
+                    IsSelected = false
+                };
+                AddNode(vm);
+            }
+
+            foreach (var connection in graphData.Connections)
+            {
+                AddConnection(connection);
+            }
+
+            if (graphData.Overlays is not null)
+            {
+                foreach (var overlay in graphData.Overlays)
+                {
+                    AddOverlay(new OverlayViewModel(overlay));
+                }
             }
         }
-
-        foreach (var graphNode in graphData.Nodes)
+        finally
         {
-            var vm = new NodeViewModel(graphNode.Data)
-            {
-                Position = graphNode.Position,
-                Size = graphNode.Size,
-                IsSelected = false
-            };
-            AddNode(vm);
+            _suppressDynamicSync = false;
         }
 
-        foreach (var connection in graphData.Connections)
+        foreach (var node in Nodes)
         {
-            AddConnection(connection);
-        }
-
-        if (graphData.Overlays is not null)
-        {
-            foreach (var overlay in graphData.Overlays)
-            {
-                AddOverlay(new OverlayViewModel(overlay));
-            }
+            SyncDynamicInputSocketsCore(node.Data.Id);
         }
     }
 
@@ -460,6 +473,8 @@ public class NodeEditorState : INodeEditorState
 
     public object? NodeRegistryKey { get; set; }
 
+    private bool _suppressDynamicSync;
+
     /// <summary>
     /// Adds a node to the graph and raises the <see cref="NodeAdded"/> event.
     /// </summary>
@@ -468,6 +483,10 @@ public class NodeEditorState : INodeEditorState
     {
         Nodes.Add(node);
         NodeAdded?.Invoke(this, new NodeEventArgs(node));
+        if (!_suppressDynamicSync)
+        {
+            SyncDynamicInputSocketsCore(node.Data.Id);
+        }
         return node;
     }
 
@@ -525,6 +544,10 @@ public class NodeEditorState : INodeEditorState
     {
         Connections.Add(connection);
         ConnectionAdded?.Invoke(this, new ConnectionEventArgs(connection));
+        if (!_suppressDynamicSync)
+        {
+            SyncDynamicInputSocketsCore(connection.InputNodeId);
+        }
     }
 
     /// <summary>
@@ -540,6 +563,79 @@ public class NodeEditorState : INodeEditorState
 
         Connections.Remove(connection);
         ConnectionRemoved?.Invoke(this, new ConnectionEventArgs(connection));
+        if (!_suppressDynamicSync)
+        {
+            SyncDynamicInputSocketsCore(connection.InputNodeId);
+        }
+    }
+
+    public void SyncDynamicInputSockets(string nodeId) => SyncDynamicInputSocketsCore(nodeId);
+
+    public void SetSocketValue(string nodeId, string socketName, object? value)
+    {
+        var node = Nodes.FirstOrDefault(n => n.Data.Id == nodeId);
+        if (node is null)
+        {
+            return;
+        }
+
+        var socket = node.Inputs.FirstOrDefault(s => s.Data.Name == socketName)
+            ?? node.Outputs.FirstOrDefault(s => s.Data.Name == socketName);
+        if (socket is null)
+        {
+            return;
+        }
+
+        socket.SetValue(value);
+        if (DynamicSocketGroup.IsDynamic(socket.Data))
+        {
+            SyncDynamicInputSocketsCore(nodeId);
+        }
+        else
+        {
+            SocketValuesChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void SyncDynamicInputSocketsCore(string nodeId)
+    {
+        var node = Nodes.FirstOrDefault(n => n.Data.Id == nodeId);
+        if (node is null)
+        {
+            return;
+        }
+
+        var snapshot = node.Inputs.Select(socket => socket.Data).ToList();
+        var result = DynamicSocketGroup.Sync(snapshot, Connections.ToList(), nodeId);
+        if (!result.Changed)
+        {
+            return;
+        }
+
+        node.ReplaceInputs(result.Inputs, result.RenamedSockets);
+
+        if (!ReferenceEquals(result.Connections, Connections) && !result.Connections.SequenceEqual(Connections))
+        {
+            for (var i = 0; i < Connections.Count && i < result.Connections.Count; i++)
+            {
+                if (Connections[i] != result.Connections[i])
+                {
+                    Connections[i] = result.Connections[i];
+                }
+            }
+
+            while (Connections.Count > result.Connections.Count)
+            {
+                Connections.RemoveAt(Connections.Count - 1);
+            }
+
+            for (var i = Connections.Count; i < result.Connections.Count; i++)
+            {
+                Connections.Add(result.Connections[i]);
+            }
+        }
+
+        SocketValuesChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

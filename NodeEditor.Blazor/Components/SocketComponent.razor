@@ -44,6 +44,9 @@
     [Parameter]
     public EventCallback<SocketPointerEventArgs> OnPointerUp { get; set; }
 
+    [CascadingParameter]
+    private INodeEditorState? EditorState { get; set; }
+
     private bool ShowEditor =>
         Socket.Data.IsInput &&
         !Socket.Data.IsExecution &&
@@ -66,7 +69,14 @@
                 Node = Node,
                 SetValue = value =>
                 {
-                    Socket.SetValue(value);
+                    if (EditorState is not null)
+                    {
+                        EditorState.SetSocketValue(NodeId, Socket.Data.Name, value);
+                    }
+                    else
+                    {
+                        Socket.SetValue(value);
+                    }
                     StateHasChanged();
                 }
             };

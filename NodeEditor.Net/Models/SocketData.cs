@@ -9,5 +9,8 @@ public sealed record class SocketData(
     bool IsExecution,
     SocketValue? Value = null,
     SocketEditorHint? EditorHint = null,
-    CustomEditorHint? CustomEditor = null
+    CustomEditorHint? CustomEditor = null,
+    string? DynamicGroup = null,
+    int? DynamicIndex = null,
+    string? DynamicItemTypeName = null
 );

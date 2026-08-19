@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Services;
 
 namespace NodeEditor.Net.Services.Execution;
 
@@ -29,6 +30,9 @@ internal sealed class NodeExecutionContextImpl : INodeExecutionContext
         // ResolveAllDataInputsAsync runs before ExecuteAsync, so values should be cached.
         if (_runtime.RuntimeStorage.TryGetSocketValue(Node.Id, socketName, out var cached))
             return Cast<T>(cached);
+
+        if (DynamicSocketGroup.TryAssemble<T>(Node, socketName, _runtime.RuntimeStorage, out var assembled))
+            return assembled;
 
         // Fallback: read the socket default value directly. We intentionally avoid
         // the previous sync-over-async ResolveInputAsync(...).GetAwaiter().GetResult()

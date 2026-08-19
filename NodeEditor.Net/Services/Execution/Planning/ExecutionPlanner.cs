@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NodeEditor.Net.Models;
+using NodeEditor.Net.Services;
 
 namespace NodeEditor.Net.Services.Execution;
 
@@ -91,6 +92,9 @@ public sealed class ExecutionPlanner
         {
             foreach (var input in node.Inputs.Where(i => !i.IsExecution))
             {
+                if (DynamicSocketGroup.IsDynamic(input))
+                    continue;
+
                 if (input.Value is not null)
                     continue;
 

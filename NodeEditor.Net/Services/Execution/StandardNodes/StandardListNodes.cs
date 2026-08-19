@@ -8,9 +8,10 @@ public static class StandardListNodes
     public static IEnumerable<NodeDefinition> GetDefinitions()
     {
         yield return NodeBuilder.Create("List Create")
-            .Category("Lists").Description("Creates an empty list.")
+            .Category("Lists").Description("Creates a list from item sockets. Connect or set a value to add another item.")
+            .DynamicListInput<object>("Items")
             .Output<SerializableList>("Result")
-            .OnExecute(async (ctx, ct) => ctx.SetOutput("Result", new SerializableList()))
+            .OnExecute(async (ctx, ct) => ctx.SetOutput("Result", ctx.GetInput<SerializableList>("Items") ?? new SerializableList()))
             .Build();
 
         yield return NodeBuilder.Create("List Add")

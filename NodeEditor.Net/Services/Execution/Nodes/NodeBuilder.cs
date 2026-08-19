@@ -1,5 +1,6 @@
 using NodeEditor.Net.Models;
 using NodeEditor.Net.Records;
+using NodeEditor.Net.Services;
 using NodeEditor.Net.Services.Registry;
 using System;
 using System.Collections.Generic;
@@ -95,6 +96,13 @@ public sealed class NodeBuilder : INodeBuilder
     {
         var socketValue = defaultValue is not null ? SocketValue.FromObject(defaultValue) : null;
         AddSocketIfMissing(_inputs, new SocketData(name, typeof(T).FullName!, true, false, socketValue, editorHint, customEditorHint));
+        return this;
+    }
+
+    public INodeBuilder DynamicListInput<TItem>(string name, SocketEditorHint? editorHint = null)
+    {
+        var itemTypeName = typeof(TItem).FullName ?? typeof(TItem).Name;
+        AddSocketIfMissing(_inputs, DynamicSocketGroup.CreateItemSocket(name, 0, itemTypeName, editorHint));
         return this;
     }
 

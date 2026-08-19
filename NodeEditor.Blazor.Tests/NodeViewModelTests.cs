@@ -24,4 +24,30 @@ public sealed class NodeViewModelTests
         Assert.Equal("In", viewModel.Inputs[0].Data.Name);
         Assert.Equal("Out", viewModel.Outputs[0].Data.Name);
     }
+
+    [Fact]
+    public void ReplaceInputs_ReusesViewModelWhenNameUnchanged()
+    {
+        var original = new SocketData("Items[0]", "System.Object", true, false);
+        var viewModel = new NodeViewModel(new NodeData(
+            "node-1",
+            "List Create",
+            false,
+            false,
+            false,
+            new[] { original },
+            Array.Empty<SocketData>()));
+        var first = viewModel.Inputs[0];
+
+        viewModel.ReplaceInputs(new[]
+        {
+            original with { Value = SocketValue.FromObject("A") },
+            new SocketData("Items[1]", "System.Object", true, false)
+        });
+
+        Assert.Equal(2, viewModel.Inputs.Count);
+        Assert.Same(first, viewModel.Inputs[0]);
+        Assert.Equal("A", viewModel.Inputs[0].Data.Value?.ToObject<string>());
+        Assert.Equal(1, viewModel.InputsVersion);
+    }
 }
